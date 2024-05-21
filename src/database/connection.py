@@ -1,12 +1,9 @@
-import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base
 
-load_dotenv()
+from src.database.models import Base
+from src.config import DATABASE_URL
 
-DATABASE_URL = os.getenv('DATABASE_URL')
 
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
@@ -18,6 +15,3 @@ def create_database():
         print("Database and tables created!")
     except Exception as e:
         print(f"An error occurred: {e}")
-
-if __name__ == '__main__':
-    create_database()
