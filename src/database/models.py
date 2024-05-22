@@ -3,12 +3,14 @@ from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     portfolios = relationship('Portfolio', back_populates='owner')
+
 
 class Portfolio(Base):
     __tablename__ = 'portfolios'
@@ -17,6 +19,7 @@ class Portfolio(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship('User', back_populates='portfolios')
     elements = relationship('PortfolioElement', back_populates='portfolio')
+
 
 class PortfolioElement(Base):
     __tablename__ = 'portfolio_elements'
@@ -30,6 +33,7 @@ class PortfolioElement(Base):
     asset_id = Column(Integer, ForeignKey('assets.id'))
     asset = relationship('Asset', back_populates='portfolio_elements')
 
+
 class Asset(Base):
     __tablename__ = 'assets'
     id = Column(Integer, primary_key=True)
@@ -40,6 +44,7 @@ class Asset(Base):
     asset_type_id = Column(Integer, ForeignKey('asset_types.id'))
     asset_type = relationship('AssetType', back_populates='assets')
     portfolio_elements = relationship('PortfolioElement', back_populates='asset')
+
 
 class AssetType(Base):
     __tablename__ = 'asset_types'
