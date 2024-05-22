@@ -9,11 +9,11 @@ try:
     Session = sessionmaker(bind=engine)
     session = Session()
 except Exception as e:
-    print(f"Error establishing Database connection: {e}")
+    print(f'Error establishing Database connection: {e}')
 
 def create_database():
     try:
         Base.metadata.create_all(engine) 
-        print("Database and tables created!")
+        print('Database tables created!')
     except Exception as e:
-        print(f"Database could not be created: {e}")
+        print(f'Database tables could not be created: {e}')
