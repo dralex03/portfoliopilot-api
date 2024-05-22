@@ -10,7 +10,7 @@ try:
     Session = sessionmaker(bind=engine)
     session = Session()
 except Exception as e:
-    print(f"Error establishing Database connection: {e}")
+    print(f"Error establishing Database connection (Is .env correctly configured?): {e}")
     sys.exit(1)
 
 

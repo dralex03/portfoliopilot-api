@@ -27,7 +27,6 @@ class PortfolioElement(Base):
     count = Column(Float, nullable=False)
     buy_price = Column(Float, nullable=False)
     order_fee = Column(Float, nullable=True)
-    buy_datetime = Column(DateTime, nullable=False)
     portfolio_id = Column(Integer, ForeignKey('portfolios.id'))
     portfolio = relationship('Portfolio', back_populates='elements')
     asset_id = Column(Integer, ForeignKey('assets.id'))
