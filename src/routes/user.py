@@ -16,11 +16,19 @@ def register():
     user_email = post_data.get('email')
     user_password = post_data.get('password')
 
-    # Validate email and password inputs
-    if not is_valid_email(user_email) or not is_strong_password(user_password):
+    # Validate email input
+    if not is_valid_email(user_email):
         response_object = {
             'success': False,
-            'message': 'Email or Password is invalid'
+            'message': 'Invalid Email address.'
+        }
+        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+    
+    # Validate password input
+    if not is_strong_password(user_password):
+        response_object = {
+            'success': False,
+            'message': 'Password does not meet requirements.'
         }
         return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
 
