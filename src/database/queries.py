@@ -4,6 +4,16 @@ from src.database.models import Portfolio, PortfolioElement
 
 
 def add_portfolio(name, user_id):
+    """
+        Erstellt ein Portfolio anhand des übergebenen Namens und der Id des Nutzers
+            Parameters:
+                str name
+                int user_id
+            Returns:
+                Boolean: True if the portfolio was successfully created, else False
+            Raises:
+                Value Error: If name is not str or user_id not int
+    """
     try:
         new_portfolio = Portfolio(
             name=name,
@@ -18,15 +28,26 @@ def add_portfolio(name, user_id):
         #  Commit the Transaction
 
         print("Portfolio added successfully!")
+        return True
 
     except Exception as e:
         session.rollback()
         #  Roll back the Transaction due to an error
 
         print(f"Failed to add portfolio: {e}")
+        return False
 
 
 def delete_portfolio_by_id(portfolio_id):
+    """
+        Löscht ein Portfolio anhand der übergebenen id
+            Parameters:
+                int portfolio_id
+            Returns:
+                Boolean: True if the portfolio was successfully deleted, else False
+            Raises:
+                Value Error: If portfolio_id is not int
+    """
     try:
         portfolio_to_delete = session.query(Portfolio).filter_by(id=portfolio_id).one()
         #  Find the Portfolio to delete via ID
@@ -38,16 +59,34 @@ def delete_portfolio_by_id(portfolio_id):
         #  Commit the Transaction
 
         print(f"Portfolio with id {portfolio_id} deleted successfully!")
+        return True
+
     except NoResultFound:
         print(f"No portfolio found with id {portfolio_id}")
+        return False
+
     except Exception as e:
         session.rollback()
         #  Roll back the Transaction due to an error
 
         print(f"Failed to delete portfolio: {e}")
+        return False
 
 
 def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee):
+    """
+        Fügt dem übergebenem Portfolio das übergebene Portfolio Element hinzu
+            Parameters:
+                int portfolio_id
+                int asset_id
+                float count
+                float buy_price
+                float order_fee
+            Returns:
+                Boolean: True if the portfolio element was successfully added, else False
+            Raises:
+                Value Error: If portfolio_id, asset_id are not int and if count, buy_price or order_fee are not a Number
+    """
     existing_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
                                                                            asset_id=asset_id).first()
     #  Check if the added Asset already exists in the portfolio
@@ -87,6 +126,17 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
 
 
 def delete_portfolio_element(portfolio_id, asset_id):
+    """
+    Löscht ein Portfolio Element aus dem übergebenem Portfolio
+        Parameters:
+            int portfolio_id
+            int asset_id
+        Returns:
+            Boolean: True if the portfolio element was successfully deleted, else False
+        Raises:
+            Value Error: If portfolio_id or asset_id are not int
+    """
+
     try:
         portfolio_element_to_delete = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
                                                                                 asset_id=asset_id).one()
@@ -99,12 +149,14 @@ def delete_portfolio_element(portfolio_id, asset_id):
         #  Commit the Transaction
 
         print(f"PortfolioElement with portfolio_id {portfolio_id} and with asset_id {asset_id} deleted successfully!")
+        return True
+
     except NoResultFound:
         print(f"No PortfolioElement found with portfolio_id {portfolio_id} and asset_id {asset_id}")
+        return False
     except Exception as e:
         session.rollback()
         #  Roll back the Transaction due to an error
 
         print(f"Failed to delete PortfolioElement: {e}")
-
-
+        return False
