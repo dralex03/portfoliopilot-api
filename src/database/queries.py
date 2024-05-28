@@ -1,6 +1,6 @@
 from sqlalchemy.exc import NoResultFound
 from src.database.connection import session
-from src.database.models import Portfolio, PortfolioElement
+from src.database.models import Portfolio, PortfolioElement, User
 
 
 def add_portfolio(name, user_id):
@@ -136,7 +136,7 @@ def delete_portfolio_element(portfolio_id, asset_id):
         Raises:
             Value Error: If portfolio_id or asset_id are not int
     """
-
+    
     try:
         portfolio_element_to_delete = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
                                                                                 asset_id=asset_id).one()
@@ -160,3 +160,33 @@ def delete_portfolio_element(portfolio_id, asset_id):
 
         print(f"Failed to delete PortfolioElement: {e}")
         return False
+
+def get_user_by_email(email):
+    """
+    Fetches a user by email from the database
+        Parameters:
+            email: str
+        Returns:
+            User: user object
+    """
+
+    return session.query(User).filter(User.email == email).first()
+
+def insert_new_user(email, password):
+    """
+    Inserts new user into database and returns the created object
+        Parameters:
+            email: str
+            password: str
+        Returns:
+            User: created user object
+    """
+
+    try:
+        new_user = User(email=email, password=password)
+        session.add(new_user)
+        session.commit()
+        return new_user
+    except Exception as e:
+        print('Error inserting new user: ' + e)
+        return None

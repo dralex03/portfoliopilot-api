@@ -17,7 +17,7 @@ except Exception as e:
 def create_database():
     try:
         Base.metadata.create_all(engine)
-        print("Database and tables created!")
+        print("Database tables created!")
     except Exception as e:
         print(f"Database could not be created: {e}")
         sys.exit(1)
