@@ -18,7 +18,7 @@ class Portfolio(Base):
     name = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship('User', back_populates='portfolios')
-    elements = relationship('PortfolioElement', back_populates='portfolio')
+    elements = relationship('PortfolioElement', back_populates='portfolio', cascade='all, delete-orphan')
 
 
 class PortfolioElement(Base):

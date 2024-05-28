@@ -193,5 +193,6 @@ def insert_new_user(email, password):
         session.commit()
         return new_user
     except Exception as e:
-        print('Error inserting new user: ' + e)
+        print(f'Failed to insert User: {e}')
+        session.rollback()
         return None
