@@ -10,14 +10,14 @@ try:
     Session = sessionmaker(bind=engine)
     session = Session()
 except Exception as e:
-    print(f"Error establishing Database connection (Is .env correctly configured?): {e}")
+    print(f'Error establishing Database connection (Is .env correctly configured?): {e}')
     sys.exit(1)
 
 
 def create_database():
     try:
         Base.metadata.create_all(engine)
-        print("Database tables created!")
+        print('Database tables created!')
     except Exception as e:
-        print(f"Database could not be created: {e}")
+        print(f'Database could not be created: {e}')
         sys.exit(1)
