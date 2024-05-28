@@ -1,4 +1,11 @@
-from src.database.connection import create_database
+from flask.cli import FlaskGroup
 
-if __name__ == '__main__':
+from src.database.connection import create_database
+from src import api
+
+
+cli = FlaskGroup(api)
+
+if __name__ == "__main__":
     create_database()
+    cli()
