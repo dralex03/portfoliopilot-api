@@ -14,6 +14,9 @@ def add_portfolio(name, user_id):
         Raises:
             Value Error: If name is not str or user_id not int
     """
+    if not isinstance(name, str) or not isinstance(user_id, int):
+        raise ValueError("Invalid input types for 'name' or 'user_id'.")
+
     try:
         new_portfolio = Portfolio(
             name=name,
@@ -48,6 +51,9 @@ def delete_portfolio_by_id(portfolio_id):
         Raises:
             Value Error: If portfolio_id is not int
     """
+    if not isinstance(portfolio_id, int):
+        raise ValueError("Invalid input type for 'portfolio_id'")
+
     try:
         portfolio_to_delete = session.query(Portfolio).filter_by(id=portfolio_id).one()
         #  Find the Portfolio to delete via ID
@@ -87,6 +93,10 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
         Raises:
             Value Error: If portfolio_id, asset_id are not int and if count, buy_price or order_fee are not a Number
     """
+    if not isinstance(portfolio_id, int) or not isinstance(asset_id, int) or not isinstance(count, float)\
+            or not isinstance(buy_price, float) or not isinstance(order_fee, float):
+        raise ValueError("Invalid input types for 'portfolio_id', 'asset_id', 'count', 'buy_price' or 'order_fee'.")
+
     existing_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
                                                                  asset_id=asset_id).first()
     #  Check if the added Asset already exists in the portfolio
@@ -139,12 +149,14 @@ def remove_portfolio_element(portfolio_id, asset_id, count=-1):
         Parameters:
             int portfolio_id
             int asset_id
-            int count (optional)
+            float count (optional)
         Returns:
             Boolean: True if the portfolio element was successfully deleted or reduced, else False
         Raises:
             Value Error: If portfolio_id or asset_id are not int
     """
+    if not isinstance(portfolio_id, int) or not isinstance(asset_id, int) or not isinstance(count, float):
+        raise ValueError("Invalid input types for 'portfolio_id', 'asset_id' or 'count'.")
 
     try:
         target_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
@@ -183,7 +195,11 @@ def get_user_by_email(email):
             email: str
         Returns:
             User: user object
+        Raises:
+            Value Error: If email is not str
     """
+    if not isinstance(email, str):
+        raise ValueError("Invalid input type for 'email'.")
 
     return session.query(User).filter(User.email == email).first()
 
@@ -196,7 +212,11 @@ def insert_new_user(email, password):
             password: str
         Returns:
             User: created user object
+        Raises:
+            Value Error: If email or password are not str
     """
+    if not isinstance(email, str) or not isinstance(password, str):
+        raise ValueError("Invalid input types for 'email' or 'password'.")
 
     try:
         new_user = User(email=email, password=password)
