@@ -30,7 +30,6 @@ def add_portfolio(name, user_id):
         session.commit()
         #  Commit the Transaction
 
-        print('Portfolio added successfully!')
         return True
 
     except Exception as e:
@@ -64,7 +63,6 @@ def delete_portfolio_by_id(portfolio_id):
         session.commit()
         #  Commit the Transaction
 
-        print(f'Portfolio with id {portfolio_id} deleted successfully!')
         return True
 
     except NoResultFound:
@@ -118,7 +116,6 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
         session.commit()
         #  Commit the Transaction
 
-        print(f'Successfully increased the count of the asset {asset_id} in portfolio {portfolio_id}.')
         return True
 
     else:
@@ -133,7 +130,6 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
             session.commit()
             #  Commit the Transaction
 
-            print(f'Successfully inserted asset.')
             return True
         except Exception as e:
             session.rollback()
@@ -174,7 +170,6 @@ def remove_portfolio_element(portfolio_id, asset_id, count=-1):
         session.commit()
         #  Commit the Transaction
 
-        print(f'PortfolioElement with portfolio_id {portfolio_id} and with asset_id {asset_id} deleted successfully!')
         return True
 
     except NoResultFound:
