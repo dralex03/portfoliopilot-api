@@ -108,6 +108,9 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
         session.commit()
         #  Commit the Transaction
 
+        print(f'Successfully increased the count of the asset {asset_id} in portfolio {portfolio_id}.')
+        return True
+
     else:
         try:
             portfolio_element = PortfolioElement(count=count, buy_price=buy_price, order_fee=order_fee,
@@ -121,11 +124,13 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
             #  Commit the Transaction
 
             print(f'Successfully inserted asset.')
+            return True
         except Exception as e:
             session.rollback()
             #  Roll back the Transaction due to an error
 
             print(f'Failed to insert asset: {e}')
+            return False
 
 
 def remove_portfolio_element(portfolio_id, asset_id, count=-1):
