@@ -128,31 +128,31 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
             print(f'Failed to insert asset: {e}')
 
 
-def delete_portfolio_element(portfolio_id, asset_id, count):
+def remove_portfolio_element(portfolio_id, asset_id, count=-1):
     """
     Deletes or reduces the count of a portfolio item from the transferred portfolio
         Parameters:
             int portfolio_id
             int asset_id
-            int count
+            int count (optional)
         Returns:
-            Boolean: True if the portfolio element was successfully deleted, else False
+            Boolean: True if the portfolio element was successfully deleted or reduced, else False
         Raises:
             Value Error: If portfolio_id or asset_id are not int
     """
 
     try:
-        portfolio_element_to_delete = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
-                                                                                asset_id=asset_id).one()
+        target_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
+                                                                             asset_id=asset_id).one()
         #  Find the PortfolioElement to delete via the ID of the Portfolio and Asset
 
-        if portfolio_element_to_delete.count <= count:
-            session.delete(portfolio_element_to_delete)
-            #  Delete the PortfolioElement
+        if 0 < count < target_portfolio_element.count:
+            target_portfolio_element.count = target_portfolio_element.count - count
+            #  Reduce the count of the portfolio element
 
         else:
-            portfolio_element_to_delete.count = portfolio_element_to_delete.count - count
-            #  Reduce the count of the portfolio element
+            session.delete(target_portfolio_element)
+            #  Delete the PortfolioElement
 
         session.commit()
         #  Commit the Transaction
