@@ -60,7 +60,7 @@ def test_portfolio_insertion():
 
 def test_portfolio_element_insertion():
     logger.info('Starting test_portfolio_element_insertion')
-    portfolio_element = insert_portfolio_element('Welt portfolio', 1, 10.0, 10.0,
+    portfolio_element = insert_portfolio_element(1, 1, 10.0, 10.0,
                                                  10.0)
     assert portfolio_element is True
 
@@ -73,11 +73,11 @@ def test_portfolio_element_insertion():
 
 def test_portfolio_element_removal():
     logger.info('Starting test_portfolio_element removal')
-    portfolio_element = remove_portfolio_element(1, 1, 5.00)
+    portfolio_element = remove_portfolio_element(1, 1, 5.0)
     assert portfolio_element is True
 
     fetched_portfolio_element = database.session.query(PortfolioElement).filter_by(portfolio_id=1, asset_id=1).first()
-    logger.debug(f'Fetched portfolio: {fetched_portfolio_element}')
+    logger.debug(f'Fetched portfolio_element: {fetched_portfolio_element}')
     assert fetched_portfolio_element is not None
     assert fetched_portfolio_element.count == 5.00
     assert fetched_portfolio_element.portfolio_id == 1
