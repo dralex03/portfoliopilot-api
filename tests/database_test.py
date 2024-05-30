@@ -2,7 +2,7 @@ import logging
 from src.database.connection import database
 from src.database.models import Portfolio, User, Asset, AssetType, PortfolioElement
 from src.database.queries import insert_new_user, add_portfolio, insert_portfolio_element, remove_portfolio_element, \
-                                 get_user_by_email, delete_portfolio_by_id
+                                 get_user_by_email, delete_portfolio_by_id, reduce_portfolio_element
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -73,7 +73,7 @@ def test_portfolio_element_insertion():
 
 def test_portfolio_element_removal():
     logger.info('Starting test_portfolio_element removal')
-    portfolio_element = remove_portfolio_element(1, 1, 5.0)
+    portfolio_element = reduce_portfolio_element(1, 1, 5.00)
     assert portfolio_element is True
 
     fetched_portfolio_element = database.session.query(PortfolioElement).filter_by(portfolio_id=1, asset_id=1).first()
@@ -89,7 +89,7 @@ def test_portfolio_deletion():
     portfolio = delete_portfolio_by_id(1)
     assert portfolio is True
 
-    fetched_portfolio = database.session.query(Portfolio).filter_by(portfolio_id=1).first()
+    fetched_portfolio = database.session.query(Portfolio).filter_by(id=1).first()
     logger.debug(f'Search Results for Portfolio after Deletion: {fetched_portfolio}')
     assert fetched_portfolio is None
 

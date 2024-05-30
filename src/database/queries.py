@@ -141,9 +141,48 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
             return False
 
 
-def remove_portfolio_element(portfolio_id, asset_id, count=-1):
+def remove_portfolio_element(portfolio_id, asset_id):
     """
-    Deletes or reduces the count of a portfolio item from the transferred portfolio
+    Deletes a portfolio item from the transferred portfolio
+        Parameters:
+            int portfolio_id
+            int asset_id
+            float count (optional)
+        Returns:
+            Boolean: True if the portfolio element was successfully deleted or reduced, else False
+        Raises:
+            Value Error: If portfolio_id or asset_id are not int
+    """
+    if not isinstance(portfolio_id, int) or not isinstance(asset_id, int):
+        raise ValueError("Invalid input types for 'portfolio_id', 'asset_id' or 'count'.")
+
+    try:
+        target_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
+                                                                             asset_id=asset_id).one()
+        #  Find the PortfolioElement to delete via the ID of the Portfolio and Asset
+
+        session.delete(target_portfolio_element)
+        #  Delete the PortfolioElement
+
+        session.commit()
+        #  Commit the Transaction
+
+        return True
+
+    except NoResultFound:
+        print(f'No PortfolioElement found with portfolio_id {portfolio_id} and asset_id {asset_id}')
+        return True
+    except Exception as e:
+        session.rollback()
+        #  Roll back the Transaction due to an error
+
+        print(f'Failed to delete PortfolioElement: {e}')
+        return False
+
+
+def reduce_portfolio_element(portfolio_id, asset_id, count):
+    """
+    Reduces the count of a portfolio item from the transferred portfolio
         Parameters:
             int portfolio_id
             int asset_id
