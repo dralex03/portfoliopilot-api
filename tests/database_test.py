@@ -1,8 +1,8 @@
 import logging
 from src.database.connection import database
 from src.database.models import Portfolio, User, Asset, AssetType, PortfolioElement
-from src.database.queries import insert_new_user, add_portfolio, insert_portfolio_element, remove_portfolio_element, \
-    get_user_by_email, delete_portfolio_by_id, reduce_portfolio_element
+from src.database.queries import insert_new_user, add_portfolio, insert_portfolio_element, \
+                                get_user_by_email, delete_portfolio_by_id, reduce_portfolio_element
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -26,7 +26,7 @@ setup_database()
 
 
 def test_user_insertion():
-    user = insert_new_user(USER_EMAIL, 'password')
+    insert_new_user(USER_EMAIL, 'password')
 
     fetched_user = database.session.query(User).filter_by(email=USER_EMAIL).first()
     assert fetched_user is not None
@@ -50,7 +50,7 @@ def test_portfolio_insertion():
 
 
 def test_portfolio_element_insertion():
-    portfolio_element = insert_portfolio_element(1, 1, 10.0, 10.0,
+    insert_portfolio_element(1, 1, 10.0, 10.0,
                                                  10.0)
 
     fetched_portfolio_element = database.session.query(PortfolioElement).filter_by(portfolio_id=1, asset_id=1).first()
