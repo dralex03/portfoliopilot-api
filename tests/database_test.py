@@ -2,6 +2,10 @@ from src.database.connection import database
 from src.database.models import Portfolio, PortfolioElement, User
 from src.database.queries import insert_new_user, add_portfolio
 
+import sys
+
+sys.path.append('../src')
+
 
 def test_user_insertion():
     #  Test if the user insert_new_user function works and returns the right result
