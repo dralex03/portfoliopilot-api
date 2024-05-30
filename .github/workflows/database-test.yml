@@ -45,7 +45,9 @@ jobs:
       run: sleep 30
 
     - name: Set PYTHONPATH
-      run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+      run: |
+          export PYTHONPATH=$(pwd)/src
+          echo "PYTHONPATH set to: $PYTHONPATH"
 
     - name: Run tests
       env:
