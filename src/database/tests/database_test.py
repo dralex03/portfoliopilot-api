@@ -13,10 +13,11 @@ user_email = 'testuser@example.com'
 
 def setup_database():
     """Manually adds an asset type plus asset as these functions do not yet exist"""
-    new_asset_type = AssetType(1, 'Aktien')
+    new_asset_type = AssetType(id=1, name="Aktien", unit_type="idk")
     database.session.add(new_asset_type)
 
-    new_asset = Asset(1, 'Test A', 'TAG', 'ISIN1234', 'DOLLAR', 1)
+    new_asset = Asset(id=1, name="Test AG", ticker_symbol='TAG', isin='ISIN123', default_currency='DOLLAR',
+                      asset_type_id=1)
     database.session.add(new_asset)
     database.session.commit()
 
@@ -95,3 +96,13 @@ def test_portfolio_deletion():
     fetched_portfolio_element = database.session.query(PortfolioElement).filter_by(portfolio_id=1, asset_id=1).first()
     logger.debug(f'Search Results for Portfolio_Element after Deletion: {fetched_portfolio_element}')
     assert fetched_portfolio_element is None
+
+    fetched_asset = database.session.query(Asset).filter_by(id=1).first()
+    logger.debug(f'Search Results for Asset after Deletion: {fetched_asset}')
+    assert fetched_asset is not None
+
+    fetched_asset_type = database.session.query(Asset).filter_by(id=1).first()
+    logger.debug(f'Search Results for Asset_type after Deletion: {fetched_asset_type}')
+    assert fetched_asset_type is not None
+
+
