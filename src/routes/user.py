@@ -1,7 +1,7 @@
 import bcrypt
 from flask import Blueprint, request, make_response, jsonify
 
-from src.database import queries
+#from src.database import queries
 from src.utils.input_validation import is_valid_email, is_strong_password
 from src.utils import jwt_auth
 from src.constants import http_status_codes as status
