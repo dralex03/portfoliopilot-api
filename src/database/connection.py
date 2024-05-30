@@ -8,7 +8,6 @@ from src.config import DATABASE_URL
 
 class Database:
     def __init__(self, database_url):
-        print("creation")
         self.engine = create_engine(database_url)
 
         self.create_database()

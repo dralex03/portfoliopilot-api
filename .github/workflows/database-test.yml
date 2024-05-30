@@ -44,11 +44,6 @@ jobs:
     - name: Wait for PostgreSQL to start
       run: sleep 30
 
-    - name: Set PYTHONPATH
-      run: |
-          export PYTHONPATH=$(pwd)/src
-          echo "PYTHONPATH set to: $PYTHONPATH"
-
     - name: Run tests
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost/test_db

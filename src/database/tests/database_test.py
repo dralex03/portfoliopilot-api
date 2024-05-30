@@ -1,7 +1,3 @@
-import sys
-
-sys.path.append('../..')
-
 from src.database.connection import database
 from src.database.models import Portfolio, PortfolioElement, User
 from src.database.queries import insert_new_user, add_portfolio
