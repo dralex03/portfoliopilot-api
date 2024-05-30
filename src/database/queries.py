@@ -1,8 +1,11 @@
 from sqlalchemy.exc import NoResultFound
 from src.database.models import Portfolio, PortfolioElement, User
+from src.database.connection import database
+
+session = database.get_session()
 
 
-def add_portfolio(name, user_id, session):
+def add_portfolio(name, user_id):
     """
     Creates a portfolio based on the transferred name and ID of the user
         Parameters:
@@ -39,7 +42,7 @@ def add_portfolio(name, user_id, session):
         return False
 
 
-def delete_portfolio_by_id(portfolio_id, session):
+def delete_portfolio_by_id(portfolio_id):
     """
     Deletes a portfolio based on the passed id
         Parameters:
@@ -76,7 +79,7 @@ def delete_portfolio_by_id(portfolio_id, session):
         return False
 
 
-def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee, session):
+def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee):
     """
     Adds the transferred portfolio element to the transferred portfolio
         Parameters:
@@ -90,7 +93,7 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
         Raises:
             Value Error: If portfolio_id, asset_id are not int and if count, buy_price or order_fee are not a Number
     """
-    if not isinstance(portfolio_id, int) or not isinstance(asset_id, int) or not isinstance(count, float)\
+    if not isinstance(portfolio_id, int) or not isinstance(asset_id, int) or not isinstance(count, float) \
             or not isinstance(buy_price, float) or not isinstance(order_fee, float):
         raise ValueError("Invalid input types for 'portfolio_id', 'asset_id', 'count', 'buy_price' or 'order_fee'.")
 
@@ -138,7 +141,7 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
             return False
 
 
-def remove_portfolio_element(portfolio_id, asset_id, session, count=-1):
+def remove_portfolio_element(portfolio_id, asset_id, count=-1):
     """
     Deletes or reduces the count of a portfolio item from the transferred portfolio
         Parameters:
@@ -182,7 +185,7 @@ def remove_portfolio_element(portfolio_id, asset_id, session, count=-1):
         return False
 
 
-def get_user_by_email(email, session):
+def get_user_by_email(email):
     """
     Fetches a user by email from the database
         Parameters:
@@ -198,7 +201,7 @@ def get_user_by_email(email, session):
     return session.query(User).filter(User.email == email).first()
 
 
-def insert_new_user(email, password, session):
+def insert_new_user(email, password):
     """
     Inserts new user into database and returns the created object
         Parameters:

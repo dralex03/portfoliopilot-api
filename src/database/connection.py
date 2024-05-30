@@ -31,5 +31,8 @@ class Database:
             print(f'Database could not be created: {e}')
             sys.exit(1)
 
+    def get_session(self):
+        return self.session
+
 
 database = Database(DATABASE_URL)
