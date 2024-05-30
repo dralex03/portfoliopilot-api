@@ -44,6 +44,9 @@ jobs:
     - name: Wait for PostgreSQL to start
       run: sleep 30
 
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+
     - name: Run tests
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost/test_db
