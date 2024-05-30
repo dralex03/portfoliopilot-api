@@ -8,7 +8,7 @@ from src.database.queries import insert_new_user, add_portfolio, insert_portfoli
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-user_email = 'testuser@example.com'
+USER_EMAIL = 'testuser@example.com'
 
 
 def setup_database():
@@ -26,25 +26,22 @@ setup_database()
 
 
 def test_user_insertion():
-    user = insert_new_user(user_email, 'password')
-    assert user is not None
-    assert user.email == user_email
+    user = insert_new_user(USER_EMAIL, 'password')
 
-    fetched_user = database.session.query(User).filter_by(email=user_email).first()
+    fetched_user = database.session.query(User).filter_by(email=USER_EMAIL).first()
     assert fetched_user is not None
+    assert fetched_user.email == USER_EMAIL
 
 
 def test_get_user_by_email():
-    user = get_user_by_email(user_email)
+    user = get_user_by_email(USER_EMAIL)
     assert user is not None
-    assert user.email == user_email
+    assert user.email == USER_EMAIL
 
 
 def test_portfolio_insertion():
     PORTFOLIO_NAME = 'Welt portfolio'
-    portfolio = add_portfolio(PORTFOLIO_NAME, 1)
-    assert portfolio.name == PORTFOLIO_NAME
-    assert portfolio.user_id == 1
+    add_portfolio(PORTFOLIO_NAME, 1)
 
     fetched_portfolio = database.session.query(Portfolio).filter_by(name=PORTFOLIO_NAME, user_id=1).first()
     assert fetched_portfolio is not None
@@ -55,23 +52,18 @@ def test_portfolio_insertion():
 def test_portfolio_element_insertion():
     portfolio_element = insert_portfolio_element(1, 1, 10.0, 10.0,
                                                  10.0)
-    assert portfolio_element.portfolio_id == 1
-    assert portfolio_element.asset_id == 1
-    assert portfolio_element.order_fee == 10.0
-    assert portfolio_element.buy_price == 10.0
-    assert portfolio_element.order_fee == 10.0
 
     fetched_portfolio_element = database.session.query(PortfolioElement).filter_by(portfolio_id=1, asset_id=1).first()
     assert fetched_portfolio_element is not None
     assert fetched_portfolio_element.portfolio_id == 1
     assert fetched_portfolio_element.asset_id == 1
+    assert fetched_portfolio_element.order_fee == 10.0
+    assert fetched_portfolio_element.buy_price == 10.0
+    assert fetched_portfolio_element.order_fee == 10.0
 
 
 def test_portfolio_element_removal():
-    portfolio_element = reduce_portfolio_element(1, 1, 5.0)
-    assert portfolio_element.portfolio_id == 1
-    assert portfolio_element.asset_id == 1
-    assert portfolio_element.order_fee == 5.0
+    reduce_portfolio_element(1, 1, 5.0)
 
     fetched_portfolio_element = database.session.query(PortfolioElement).filter_by(portfolio_id=1, asset_id=1).first()
     assert fetched_portfolio_element is not None
