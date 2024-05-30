@@ -106,7 +106,7 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
         return False
 
 
-def remove_portfolio_element(portfolio_id, asset_id):
+def delete_portfolio_element(portfolio_id, asset_id):
     """
     Deletes a portfolio item from the transferred portfolio
         Parameters:
