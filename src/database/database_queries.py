@@ -1,6 +1,32 @@
 from sqlalchemy.exc import NoResultFound
 from src.database.database_models import Portfolio, PortfolioElement, User
-from src.database.database import session
+from src.database.database_setup import session
+
+
+def get_user_by_email(email: str):
+    """
+    Fetches a user by email from the database
+        Parameters:
+            email: str
+        Returns:
+            User: user object
+    """
+    return session.query(User).filter(User.email == email).first()
+
+
+def insert_new_user(email: str, password: str):
+    """
+    Inserts new user into database and returns the created object
+        Parameters:
+            email: str
+            password: str
+        Returns:
+            User: created user object
+    """
+    new_user = User(email=email, password=password)
+    session.add(new_user)
+    session.commit()
+    return new_user
 
 
 def add_portfolio(name: str, user_id: int):
@@ -103,32 +129,6 @@ def reduce_portfolio_element(portfolio_id: int, asset_id: int, count: float):
         session.delete(target_portfolio_element)
     session.commit()
     return target_portfolio_element
-
-
-def get_user_by_email(email: str):
-    """
-    Fetches a user by email from the database
-        Parameters:
-            email: str
-        Returns:
-            User: user object
-    """
-    return session.query(User).filter(User.email == email).first()
-
-
-def insert_new_user(email: str, password: str):
-    """
-    Inserts new user into database and returns the created object
-        Parameters:
-            email: str
-            password: str
-        Returns:
-            User: created user object
-    """
-    new_user = User(email=email, password=password)
-    session.add(new_user)
-    session.commit()
-    return new_user
 
 
 def call_database_function(function, *args: any):

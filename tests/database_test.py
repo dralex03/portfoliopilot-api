@@ -1,4 +1,4 @@
-from src.database.database import session
+from src.database.database_setup import session
 from src.database.database_models import Portfolio, User, Asset, AssetType, PortfolioElement
 from src.database.database_queries import insert_new_user, add_portfolio, insert_portfolio_element, \
     get_user_by_email, delete_portfolio_by_id, reduce_portfolio_element, delete_portfolio_element, \
