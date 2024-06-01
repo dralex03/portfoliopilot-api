@@ -1,6 +1,6 @@
 from sqlalchemy.exc import NoResultFound
-from src.database.database_models import Portfolio, PortfolioElement, User
-from src.database.database_setup import session
+from src.database.models import Portfolio, PortfolioElement, User
+from src.database.setup import session
 
 
 def get_user_by_email(email: str):

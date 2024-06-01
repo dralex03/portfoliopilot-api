@@ -1,8 +1,10 @@
-from src.database.database_setup import session
-from src.database.database_models import Portfolio, User, Asset, AssetType, PortfolioElement
-from src.database.database_queries import insert_new_user, add_portfolio, insert_portfolio_element, \
+from src.database.setup import session, setup_database
+from src.database.models import Portfolio, User, Asset, AssetType, PortfolioElement
+from src.database.queries import insert_new_user, add_portfolio, insert_portfolio_element, \
     get_user_by_email, delete_portfolio_by_id, reduce_portfolio_element, delete_portfolio_element, \
     call_database_function
+
+setup_database()
 
 
 def add_new_user(name: str):
@@ -81,7 +83,7 @@ def test_portfolio_element_insertion():
     call_database_function(insert_portfolio_element, new_portfolio.id, new_asset.id, 10.0, 10.0, 10.0)
 
     fetched_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=new_portfolio.id,
-                                                                                   asset_id=new_asset.id).first()
+                                                                          asset_id=new_asset.id).first()
     assert fetched_portfolio_element is not None
     assert fetched_portfolio_element.portfolio_id == new_portfolio.id
     assert fetched_portfolio_element.asset_id == new_asset.id
@@ -116,7 +118,7 @@ def test_portfolio_element_deletion():
     call_database_function(delete_portfolio_element, new_portfolio.id, new_asset.id)
 
     fetched_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=new_portfolio.id,
-                                                                                   asset_id=new_asset.id).first()
+                                                                          asset_id=new_asset.id).first()
     assert fetched_portfolio_element is None
 
 
