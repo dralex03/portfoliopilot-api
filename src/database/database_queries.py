@@ -1,11 +1,9 @@
 from sqlalchemy.exc import NoResultFound
 from src.database.database_models import Portfolio, PortfolioElement, User
-from src.database.database import database
-
-session = database.get_session()
+from src.database.database import session
 
 
-def add_portfolio(name, user_id):
+def add_portfolio(name: str, user_id: int):
     """
     Creates a portfolio based on the transferred name and ID of the user
         Parameters:
@@ -24,7 +22,7 @@ def add_portfolio(name, user_id):
     return new_portfolio
 
 
-def delete_portfolio_by_id(portfolio_id):
+def delete_portfolio_by_id(portfolio_id: int):
     """
     Deletes a portfolio based on the passed id
         Parameters:
@@ -38,7 +36,7 @@ def delete_portfolio_by_id(portfolio_id):
     return True
 
 
-def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee):
+def insert_portfolio_element(portfolio_id: int, asset_id: int, count: float, buy_price: float, order_fee: float):
     """
     Adds the transferred portfolio element to the transferred portfolio
         Parameters:
@@ -70,13 +68,13 @@ def insert_portfolio_element(portfolio_id, asset_id, count, buy_price, order_fee
     return portfolio_element
 
 
-def delete_portfolio_element(portfolio_id, asset_id):
+def delete_portfolio_element(portfolio_id: int, asset_id: int):
     """
     Deletes a portfolio item from the transferred portfolio
         Parameters:
             int portfolio_id
             int asset_id
-            float count (optional)
+            float count
         Returns:
             Boolean: True if the portfolio element was successfully deleted or reduced, else False
     """
@@ -87,13 +85,13 @@ def delete_portfolio_element(portfolio_id, asset_id):
     return True
 
 
-def reduce_portfolio_element(portfolio_id, asset_id, count):
+def reduce_portfolio_element(portfolio_id: int, asset_id: int, count: float):
     """
     Reduces the count of a portfolio item from the transferred portfolio
         Parameters:
             int portfolio_id
             int asset_id
-            float count (optional)
+            float count
         Returns:
             Boolean: True if the portfolio element was successfully deleted or reduced, else False
     """
@@ -107,7 +105,7 @@ def reduce_portfolio_element(portfolio_id, asset_id, count):
     return target_portfolio_element
 
 
-def get_user_by_email(email):
+def get_user_by_email(email: str):
     """
     Fetches a user by email from the database
         Parameters:
@@ -118,7 +116,7 @@ def get_user_by_email(email):
     return session.query(User).filter(User.email == email).first()
 
 
-def insert_new_user(email, password):
+def insert_new_user(email: str, password: str):
     """
     Inserts new user into database and returns the created object
         Parameters:
@@ -133,14 +131,14 @@ def insert_new_user(email, password):
     return new_user
 
 
-def call_database_function(function, *args):
+def call_database_function(function, *args: any):
     """
         Handles Errors for every query, in order to improve code quality by avoiding redundant try and except blocks
         Furthermore a commit after every transaction is ensured so inconsistencies are avoided
         In addition on error the database session gets rolled backed and in every case closed
     Args:
-        function:
-        *args:
+        function: function
+        *args: any
 
     Returns:
         The result of the passed function or the error with the name of the failed function
@@ -154,4 +152,3 @@ def call_database_function(function, *args):
         function_name = function.__name__
         print(f'Error in function {function_name}: {e}')
         raise
-
