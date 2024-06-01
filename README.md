@@ -10,6 +10,8 @@ DATABASE_URL = postgresql+psycopg2://username:password@host:port/database_name
 ```
   * Replace the username, password, host, port and database_name placeholders with your actual database credentials
 
+  * If you are running the database tests locally, make sure that the ```DATABASE_URL``` for the production database is replaced with the
+    one for the test database
 ### Flask Settings
   * Settings for dev environment:
 ```

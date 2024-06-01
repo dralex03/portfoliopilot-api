@@ -1,10 +1,23 @@
-from src.database.setup import session, setup_database
-from src.database.models import Portfolio, User, Asset, AssetType, PortfolioElement
+import pytest
+from sqlalchemy.exc import IntegrityError
+
+from src.database.setup import session, setup_database, engine
+from src.database.models import Portfolio, User, Asset, AssetType, PortfolioElement, Base
 from src.database.queries import insert_new_user, add_portfolio, insert_portfolio_element, \
     get_user_by_email, delete_portfolio_by_id, reduce_portfolio_element, delete_portfolio_element, \
     call_database_function
 
-setup_database()
+
+@pytest.fixture(scope='function', autouse=True)
+def setup_and_teardown_database():
+    # This will run before each test
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    yield
+    # This will run after each test
+    session.rollback()
+    session.close()
+    Base.metadata.drop_all(engine)
 
 
 def add_new_user(name: str):
@@ -51,6 +64,10 @@ def test_user_insertion():
     fetched_user = session.query(User).filter_by(email=USER_EMAIL).first()
     assert fetched_user is not None
     assert fetched_user.email == USER_EMAIL
+
+    with pytest.raises(IntegrityError):
+        call_database_function(insert_new_user, USER_EMAIL, 'password')
+        session.commit()
 
 
 def test_get_user_by_email():
