@@ -11,11 +11,9 @@ from src.database.queries import insert_new_user, add_portfolio, insert_portfoli
 @pytest.fixture(scope='function', autouse=True)
 def setup_and_teardown_database():
     # This will run before each test
-    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     yield
     # This will run after each test
-    session.rollback()
     session.close()
     Base.metadata.drop_all(engine)
 
