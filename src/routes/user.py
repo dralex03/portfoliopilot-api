@@ -38,7 +38,7 @@ def register():
     # User does not exist yet
     if not user:
         hashed_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
-        user = queries.insert_new_user(user_email, hashed_password.decode())
+        user = queries.add_new_user(user_email, hashed_password.decode())
 
         auth_token = jwt_auth.encode_auth_token(user.id)
 

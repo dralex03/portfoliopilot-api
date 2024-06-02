@@ -48,6 +48,6 @@ class Asset(Base):
 class AssetType(Base):
     __tablename__ = 'asset_types'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    name = Column(String, unique=True, nullable=False)
     unit_type = Column(String, nullable=False)
     assets = relationship('Asset', back_populates='asset_type')
