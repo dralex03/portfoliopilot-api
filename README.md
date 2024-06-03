@@ -1,5 +1,8 @@
 # PortfolioPilot API
 
+## Requirements
+  * Python 3.12 (minimum)
+
 ## Configuration of .env File
   * Create a .env File in the root project directory
 
