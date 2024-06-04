@@ -5,7 +5,7 @@ from src.database import queries
 from src.utils.input_validation import is_valid_email, is_strong_password
 from src.utils import jwt_auth
 from src.constants import http_status_codes as status
-from src.routes.decorators import jwt_required
+from src.utils.decorators import jwt_required
 
 # Create blueprint which is used in the flask app
 user = Blueprint('user', __name__)
