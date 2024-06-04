@@ -25,7 +25,7 @@ def encode_auth_token(user_id: int):
             algorithm='HS256'
         )
     except Exception as e:
-        print("Error generating JWT Token: " + e)
+        current_app.logger.error("Error generating JWT Token: " + e)
         return None
     
 def decode_auth_token(auth_token: str):
