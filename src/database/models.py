@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -10,13 +11,15 @@ class User(Base):
     password = Column(String, nullable=False)
     portfolios = relationship('Portfolio', back_populates='owner')
 
+
 class Portfolio(Base):
     __tablename__ = 'portfolios'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship('User', back_populates='portfolios')
-    elements = relationship('PortfolioElement', back_populates='portfolio')
+    elements = relationship('PortfolioElement', back_populates='portfolio', cascade='all, delete-orphan')
+
 
 class PortfolioElement(Base):
     __tablename__ = 'portfolio_elements'
@@ -24,11 +27,11 @@ class PortfolioElement(Base):
     count = Column(Float, nullable=False)
     buy_price = Column(Float, nullable=False)
     order_fee = Column(Float, nullable=True)
-    buy_datetime = Column(DateTime, nullable=False)
     portfolio_id = Column(Integer, ForeignKey('portfolios.id'))
     portfolio = relationship('Portfolio', back_populates='elements')
     asset_id = Column(Integer, ForeignKey('assets.id'))
     asset = relationship('Asset', back_populates='portfolio_elements')
+
 
 class Asset(Base):
     __tablename__ = 'assets'
@@ -40,6 +43,7 @@ class Asset(Base):
     asset_type_id = Column(Integer, ForeignKey('asset_types.id'))
     asset_type = relationship('AssetType', back_populates='assets')
     portfolio_elements = relationship('PortfolioElement', back_populates='asset')
+
 
 class AssetType(Base):
     __tablename__ = 'asset_types'
