@@ -1,5 +1,6 @@
 import jwt
 import datetime
+from flask import current_app
 
 from src.config import JWT_EXPIRY, JWT_SECRET_KEY
 
@@ -39,9 +40,14 @@ def decode_auth_token(auth_token: str):
     """
 
     try:
-        payload = jwt.decode(auth_token, JWT_SECRET_KEY)
-        print(auth_token, file=sys.stdout)
-        print(payload, file=sys.stdout)
+        payload = jwt.decode(
+            auth_token,
+            JWT_SECRET_KEY,
+            algorithms=['HS256'],
+            options={
+                'verify_signature': True
+            }
+        )
         return (True, payload['sub'])
     except jwt.ExpiredSignatureError:
         return (False, 'Signature expired. Please log in again.')
