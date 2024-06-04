@@ -1,5 +1,4 @@
 from functools import wraps
-from sqlalchemy.exc import NoResultFound
 from src.database.models import Portfolio, PortfolioElement, User, Asset, AssetType
 from src.database.setup import session
 from typing import Callable
@@ -11,7 +10,7 @@ def call_database_function(function: Callable):
         Furthermore a commit after every transaction is ensured so inconsistencies are avoided
         In addition on error the database session gets rolled backed and in every case closed
     Args:
-        function: function
+        Callable function
     Returns:
         The result of the passed function or the error with the name of the failed function
     """
@@ -24,7 +23,6 @@ def call_database_function(function: Callable):
             return result
         except Exception as e:
             session.rollback()
-            print(f'Error in function {function.__name__}: {e}')
             raise e
 
     return wrapper
@@ -35,11 +33,11 @@ def get_user_by_email(email: str):
     """
     Fetches a user by email from the database
         Parameters:
-            email: str
+            str email
         Returns:
-            User: user object
+            User
     """
-    return session.query(User).filter(User.email == email).first()
+    return session.query(User).filter(User.email == email).one()
 
 
 @call_database_function
@@ -47,10 +45,10 @@ def add_new_user(email: str, password: str):
     """
     Inserts new user into database and returns the created object
         Parameters:
-            email: str
-            password: str
+            str email
+            str password
         Returns:
-            User: created user object
+            User
     """
     new_user = User(email=email, password=password)
     session.add(new_user)
@@ -62,13 +60,16 @@ def delete_user_by_email(user_id: int):
     """
     Deletes a user based on the passed id
         Parameters:
-            user_id: int
+            int user_id
         Returns:
-            Boolean: True if the user was successfully deleted, else False
+            True if the user was successfully deleted, False otherwise
     """
     user_to_delete = session.query(User).filter(User.id == user_id).first()
-    session.delete(user_to_delete)
-    return True
+    if user_to_delete:
+        session.delete(user_to_delete)
+        return True
+    else:
+        return False
 
 
 @call_database_function
@@ -76,10 +77,10 @@ def add_portfolio(name: str, user_id: int):
     """
     Creates a portfolio based on the transferred name and ID of the user
         Parameters:
-            name: str
-            user_id: int
+            str name
+            int user_id
         Returns:
-            Portfolio: created portfolio object
+            Portfolio
     """
     new_portfolio = Portfolio(
         name=name,
@@ -90,31 +91,46 @@ def add_portfolio(name: str, user_id: int):
 
 
 @call_database_function
+def get_portfolio(user_id: int):
+    """
+    Fetches every portfolio that belongs to a specific user
+        Parameters:
+            int user_id
+        Returns:
+            List[Portfolio]
+    """
+    return session.query(Portfolio).filter(Portfolio.user_id == user_id).all()
+
+
+@call_database_function
 def delete_portfolio_by_id(portfolio_id: int):
     """
     Deletes a portfolio based on the passed id
         Parameters:
-            portfolio_id; int
+            int portfolio_id
         Returns:
-            Boolean: True if the portfolio was successfully deleted, else False
+            True if the Portfolio was successfully deleted, False otherwise
     """
     portfolio_to_delete = session.query(Portfolio).filter_by(id=portfolio_id).first()
-    session.delete(portfolio_to_delete)
-    return True
+    if portfolio_to_delete:
+        session.delete(portfolio_to_delete)
+        return True
+    else:
+        return False
 
 
 @call_database_function
-def insert_portfolio_element(portfolio_id: int, asset_id: int, count: float, buy_price: float, order_fee: float):
+def add_portfolio_element(portfolio_id: int, asset_id: int, count: float, buy_price: float, order_fee: float):
     """
-    Adds the transferred portfolio element to the transferred portfolio
+    Adds the passed portfolio element to the passed portfolio
         Parameters:
-            portfolio_id: int
-            asset_id: int
-            count: float
-            buy_price: float
-            order_fee: float
+            int portfolio_id
+            int asset_id
+            float count
+            float buy_price
+            float order_fee
         Returns:
-            PortfolioElement: inserted portfolio element object
+            PortfolioElement
     """
     existing_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
                                                                  asset_id=asset_id).first()
@@ -135,17 +151,33 @@ def insert_portfolio_element(portfolio_id: int, asset_id: int, count: float, buy
 
 
 @call_database_function
+def get_portfolio_element(portfolio_id: int):
+    """
+    Fetches every PortfolioElement that belongs to a user and portfolio.
+        Parameters:
+            int portfolio_id
+            int user_id
+        Returns:
+            List[PortfolioElement]
+    """
+    return session.query(PortfolioElement).filter(PortfolioElement.portfolio_id == portfolio_id).all()
+
+
+@call_database_function
 def delete_portfolio_element(portfolio_element_id: int):
     """
     Deletes the portfolio element corresponding to the passed id
         Parameters:
-            portfolio_element_id: int
+            int portfolio_element_id
         Returns:
-            Boolean: True if the portfolio element was successfully deleted or reduced, else False
+            True if the Portfolio_element was successfully deleted, False otherwise
     """
     target_portfolio_element = session.query(PortfolioElement).filter_by(id=portfolio_element_id).first()
-    session.delete(target_portfolio_element)
-    return True
+    if target_portfolio_element:
+        session.delete(target_portfolio_element)
+        return False
+    else:
+        return False
 
 
 @call_database_function
@@ -153,11 +185,11 @@ def reduce_portfolio_element(portfolio_id: int, asset_id: int, count: float):
     """
     Reduces the count of a portfolio item from the transferred portfolio
         Parameters:
-            portfolio_id: int
-            asset_id: int
-            count: float
+            int portfolio_id
+            int asset_id
+            float count
         Returns:
-            PortfolioElement: reduced portfolio element object
+            PortfolioElement
     """
     target_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
                                                                          asset_id=asset_id).first()
@@ -173,18 +205,21 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
     """
     Creates an asset based on the transferred values
         Parameters:
-            name: str
-            ticker_symbol: str
-            isin: str
-            default_currency: str
-            asset_type_id: int
+            str name
+            str ticker_symbol
+            str isin
+            str default_currency
+            int asset_type_id
         Returns:
-            Asset: the created asset object
+            Asset
     """
-    new_asset = Asset(name=name, ticker_symbol=ticker_symbol, isin=isin, default_currency=default_currency,
-                      asset_type_id=asset_type_id)
-    session.add(new_asset)
-    return new_asset
+    if session.query(AssetType).filter_by(id=asset_type_id).first():
+        new_asset = Asset(name=name, ticker_symbol=ticker_symbol, isin=isin, default_currency=default_currency,
+                          asset_type_id=asset_type_id)
+        session.add(new_asset)
+        return new_asset
+    else:
+        return 0
 
 
 @call_database_function
@@ -192,11 +227,11 @@ def get_asset_by_name(name: str):
     """
     Fetches an asset by name the database
         Parameters:
-            name: str
+            str name
         Returns:
-            Asset: asset object
+            Asset
     """
-    return session.query(Asset).filter_by(name=name).first()
+    return session.query(Asset).filter_by(name=name).one()
 
 
 @call_database_function
@@ -206,11 +241,14 @@ def delete_asset(asset_id: int):
         Parameters:
             int asset_id
         Returns:
-            Boolean: True if the asset was successfully deleted, else False
+            True if the Asset was successfully deleted, False otherwise
     """
     target_asset = session.query(Asset).filter_by(asset_type_id=asset_id).first()
-    session.delete(target_asset)
-    return True
+    if target_asset:
+        session.delete(target_asset)
+        return True
+    else:
+        return False
 
 
 @call_database_function
@@ -218,10 +256,10 @@ def add_new_asset_type(name: str, unit_type: str):
     """
     Creates an asset_type based on the transferred values
         Parameters:
-            name: str
-            unit_type: str
+            str name
+            str unit_type
         Returns:
-            AssetType: the created asset_type object
+            AssetType
     """
     new_asset_type = AssetType(name=name, unit_type=unit_type)
     session.add(new_asset_type)
@@ -233,11 +271,11 @@ def get_asset_type_by_name(name: str):
     """
     Fetches an asset_type by name the database
         Parameters:
-            name: str
+            str name
         Returns:
-           AssetType: asset_type object
+           AssetType
     """
-    return session.query(AssetType).filter_by(name=name).first()
+    return session.query(AssetType).filter_by(name=name).one()
 
 
 @call_database_function
@@ -247,8 +285,11 @@ def delete_asset_type(asset_type_id: int):
         Parameters:
             int asset_type_id
         Returns:
-            Boolean: True if the asset_type was successfully deleted, else False
+            True if the AssetType was successfully deleted, False otherwise
     """
-    target_asset = session.query(AssetType).filter_by(id=asset_type_id).first()
-    session.delete(target_asset)
-    return True
+    target_asset_type = session.query(AssetType).filter_by(id=asset_type_id).first()
+    if target_asset_type:
+        session.delete(target_asset_type)
+        return True
+    else:
+        return False

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
@@ -19,6 +19,7 @@ class Portfolio(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship('User', back_populates='portfolios')
     elements = relationship('PortfolioElement', back_populates='portfolio', cascade='all, delete-orphan')
+    __table_args__ = (UniqueConstraint('name', 'user_id', name='portfolio_name_id_uc'),)
 
 
 class PortfolioElement(Base):

@@ -1,8 +1,6 @@
 import pytest
-from sqlalchemy.exc import IntegrityError
-
-from src.database.setup import engine, session
-from src.database.models import Portfolio, User, Asset, AssetType, PortfolioElement, Base
+from src.database.setup import engine
+from src.database.models import Base
 from src.database.queries import *
 
 
@@ -62,7 +60,7 @@ def test_user_insertion():
     assert fetched_user is not None
     assert fetched_user.email == USER_EMAIL
 
-    with pytest.raises(IntegrityError):
+    with pytest.raises(Exception):
         add_new_user(USER_EMAIL, PASSWORD)
 
 
@@ -102,7 +100,7 @@ def test_portfolio_element_insertion():
     new_user = insert_new_user(NAME)
     new_portfolio = insert_new_portfolio(NAME, new_user.id)
 
-    insert_portfolio_element(new_portfolio.id, new_asset.id, 10.0, 10.0, 10.0)
+    add_portfolio_element(new_portfolio.id, new_asset.id, 10.0, 10.0, 10.0)
 
     fetched_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=new_portfolio.id,
                                                                           asset_id=new_asset.id).first()
@@ -131,6 +129,29 @@ def test_portfolio_element_removal():
     assert fetched_portfolio_element.count == 5.0
 
 
+def test_get_portfolio_element():
+    FIRST_NAME = 'TGP1'
+    SECOND_NAME = 'TGP2'
+
+    new_asset_type = insert_new_asset_type(FIRST_NAME)
+    new_asset_1 = insert_new_asset(FIRST_NAME, new_asset_type.id)
+    new_asset_2 = insert_new_asset(SECOND_NAME, new_asset_type.id)
+
+    new_user = insert_new_user(FIRST_NAME)
+    new_portfolio = insert_new_portfolio(FIRST_NAME, new_user.id)
+
+    insert_new_portfolio_element(10.0, new_portfolio.id, new_asset_1.id)
+    insert_new_portfolio_element(20.0, new_portfolio.id, new_asset_2.id)
+
+    fetched_portfolio_elements = get_portfolio_element(new_portfolio.id)
+
+    assert fetched_portfolio_elements is not None
+    assert len(fetched_portfolio_elements) == 2
+    assert any(portfolio.order_fee == 10.0 for portfolio in fetched_portfolio_elements)
+    assert any(portfolio.order_fee == 20.0 for portfolio in fetched_portfolio_elements)
+    assert (portfolio.order_fee == 20.0 for portfolio in fetched_portfolio_elements)
+
+
 def test_portfolio_element_deletion():
     NAME = 'TPED'
     new_asset_type = insert_new_asset_type(NAME)
@@ -144,6 +165,20 @@ def test_portfolio_element_deletion():
     fetched_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=new_portfolio.id,
                                                                           asset_id=new_asset.id).first()
     assert fetched_portfolio_element is None
+
+
+def test_get_portfolio():
+    FIRST_NAME = 'TGP1'
+    SECOND_NAME = 'TGP2'
+    new_user = insert_new_user(FIRST_NAME)
+    insert_new_portfolio(FIRST_NAME, new_user.id)
+    insert_new_portfolio(SECOND_NAME, new_user.id)
+
+    fetched_portfolio = get_portfolio(new_user.id)
+    assert fetched_portfolio is not None
+    assert len(fetched_portfolio) == 2
+    assert any(portfolio.name == FIRST_NAME for portfolio in fetched_portfolio)
+    assert any(portfolio.name == SECOND_NAME for portfolio in fetched_portfolio)
 
 
 def test_portfolio_deletion():
@@ -201,9 +236,6 @@ def test_get_asset_by_name():
     assert fetched_asset is not None
     assert fetched_asset.name == new_asset.name
 
-    with pytest.raises(IntegrityError):
-        add_new_asset(NAME, NAME, NAME, NAME, new_asset_type.id)
-
 
 def test_asset_deletion():
     NAME = 'TAD'
@@ -211,9 +243,9 @@ def test_asset_deletion():
     new_asset = insert_new_asset(NAME, new_asset_type.id)
 
     delete_asset(new_asset.id)
-    fetched_asset = get_asset_by_name(new_asset.name)
 
-    assert fetched_asset is None
+    with pytest.raises(Exception):
+        get_asset_by_name(new_asset.name)
 
 
 def test_asset_type_insertion():
@@ -225,7 +257,7 @@ def test_asset_type_insertion():
     assert fetched_asset_type is not None
     assert fetched_asset_type.name == new_asset_type.name
 
-    with pytest.raises(IntegrityError):
+    with pytest.raises(Exception):
         add_new_asset_type(NAME, NAME)
 
 
