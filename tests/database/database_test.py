@@ -67,7 +67,7 @@ def test_user_insertion():
 def test_user_deletion():
     new_user = insert_new_user('UD')
 
-    delete_user_by_email(new_user.id)
+    delete_user_by_id(new_user.id)
 
     fetched_user = session.query(User).filter_by(email=new_user.email).first()
     assert fetched_user is None
@@ -174,7 +174,7 @@ def test_get_portfolio():
     insert_new_portfolio(FIRST_NAME, new_user.id)
     insert_new_portfolio(SECOND_NAME, new_user.id)
 
-    fetched_portfolio = get_portfolio(new_user.id)
+    fetched_portfolio = get_portfolio_by_user_id(new_user.id)
     assert fetched_portfolio is not None
     assert len(fetched_portfolio) == 2
     assert any(portfolio.name == FIRST_NAME for portfolio in fetched_portfolio)

@@ -56,13 +56,13 @@ def add_new_user(email: str, password: str):
 
 
 @call_database_function
-def delete_user_by_email(user_id: int):
+def delete_user_by_id(user_id: int):
     """
     Deletes a user based on the passed id
         Parameters:
             int user_id
         Returns:
-            True if the user was successfully deleted, False otherwise
+            Boolean True if the user was successfully deleted, False otherwise
     """
     user_to_delete = session.query(User).filter(User.id == user_id).first()
     if user_to_delete:
@@ -91,7 +91,7 @@ def add_portfolio(name: str, user_id: int):
 
 
 @call_database_function
-def get_portfolio(user_id: int):
+def get_portfolio_by_user_id(user_id: int):
     """
     Fetches every portfolio that belongs to a specific user
         Parameters:
@@ -109,7 +109,7 @@ def delete_portfolio_by_id(portfolio_id: int):
         Parameters:
             int portfolio_id
         Returns:
-            True if the Portfolio was successfully deleted, False otherwise
+            Boolean True if the Portfolio was successfully deleted, False otherwise
     """
     portfolio_to_delete = session.query(Portfolio).filter_by(id=portfolio_id).first()
     if portfolio_to_delete:
@@ -170,7 +170,7 @@ def delete_portfolio_element(portfolio_element_id: int):
         Parameters:
             int portfolio_element_id
         Returns:
-            True if the Portfolio_element was successfully deleted, False otherwise
+            Boolean True if the Portfolio_element was successfully deleted, False otherwise
     """
     target_portfolio_element = session.query(PortfolioElement).filter_by(id=portfolio_element_id).first()
     if target_portfolio_element:
@@ -241,7 +241,7 @@ def delete_asset(asset_id: int):
         Parameters:
             int asset_id
         Returns:
-            True if the Asset was successfully deleted, False otherwise
+            Boolean True if the Asset was successfully deleted, False otherwise
     """
     target_asset = session.query(Asset).filter_by(asset_type_id=asset_id).first()
     if target_asset:
@@ -285,7 +285,7 @@ def delete_asset_type(asset_type_id: int):
         Parameters:
             int asset_type_id
         Returns:
-            True if the AssetType was successfully deleted, False otherwise
+            Boolean True if the AssetType was successfully deleted, False otherwise
     """
     target_asset_type = session.query(AssetType).filter_by(id=asset_type_id).first()
     if target_asset_type:
