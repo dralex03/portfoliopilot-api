@@ -37,7 +37,7 @@ def get_user_by_email(email: str):
         Returns:
             User
     """
-    return session.query(User).filter(User.email == email).one()
+    return session.query(User).filter(User.email == email).first()
 
 
 @call_database_function
@@ -192,7 +192,7 @@ def reduce_portfolio_element(portfolio_id: int, asset_id: int, count: float):
             PortfolioElement
     """
     target_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
-                                                                         asset_id=asset_id).first()
+                                                                         asset_id=asset_id).one()
     if 0 < count < target_portfolio_element.count:
         target_portfolio_element.count = target_portfolio_element.count - count
     else:
@@ -219,7 +219,7 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
         session.add(new_asset)
         return new_asset
     else:
-        return 0
+        return None
 
 
 @call_database_function
