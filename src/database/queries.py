@@ -37,8 +37,18 @@ def get_user_by_email(email: str):
         Returns:
             User
     """
-    return session.query(User).filter(User.email == email).one()
+    return session.query(User).filter(User.email == email).first()
 
+@call_database_function
+def get_user_by_id(id: int):
+    """
+    Fetches a user by ID from the database
+        Parameters:
+            int id
+        Returns:
+            User
+    """
+    return session.query(User).filter(User.id == id).one()
 
 @call_database_function
 def add_new_user(email: str, password: str):
@@ -192,7 +202,7 @@ def reduce_portfolio_element(portfolio_id: int, asset_id: int, count: float):
             PortfolioElement
     """
     target_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
-                                                                         asset_id=asset_id).first()
+                                                                         asset_id=asset_id).one()
     if 0 < count < target_portfolio_element.count:
         target_portfolio_element.count = target_portfolio_element.count - count
     else:
@@ -219,7 +229,7 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
         session.add(new_asset)
         return new_asset
     else:
-        return 0
+        return None
 
 
 @call_database_function
@@ -250,7 +260,6 @@ def delete_asset(asset_id: int):
     else:
         return False
 
-
 @call_database_function
 def add_new_asset_type(name: str, unit_type: str):
     """
@@ -276,7 +285,6 @@ def get_asset_type_by_name(name: str):
            AssetType
     """
     return session.query(AssetType).filter_by(name=name).one()
-
 
 @call_database_function
 def delete_asset_type(asset_type_id: int):
