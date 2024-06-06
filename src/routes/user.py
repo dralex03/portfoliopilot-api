@@ -79,7 +79,7 @@ def register():
     if not user:
         # Hash password with bcrypt and insert new user into database
         hashed_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
-        user = queries.insert_new_user(user_email, hashed_password.decode())
+        user = queries.add_new_user(user_email, hashed_password.decode())
 
         return generate_auth_token_response(user.id, 'User created successfully.', status.HTTP_201_CREATED)
     
