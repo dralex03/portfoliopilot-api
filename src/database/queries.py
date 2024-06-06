@@ -39,6 +39,16 @@ def get_user_by_email(email: str):
     """
     return session.query(User).filter(User.email == email).first()
 
+@call_database_function
+def get_user_by_id(id: int):
+    """
+    Fetches a user by ID from the database
+        Parameters:
+            int id
+        Returns:
+            User
+    """
+    return session.query(User).filter(User.id == id).one()
 
 @call_database_function
 def add_new_user(email: str, password: str):
