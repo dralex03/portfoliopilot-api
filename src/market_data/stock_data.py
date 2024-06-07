@@ -4,6 +4,8 @@ import json
 
 def get_stock_info(ticker: str):
     """
+    Returns specific stock information from yahoo finance
+
     Args:
         ticker: Stock ticker symbol
 
@@ -12,6 +14,8 @@ def get_stock_info(ticker: str):
     """
     ticker_obj = yf.Ticker(ticker)
     info = ticker_obj.info
+
+    ticker_obj_insider_purchases = ticker_obj.insider_purchases
 
     # Create a dictionary to hold the stock data
     stock_data = {
@@ -29,15 +33,17 @@ def get_stock_info(ticker: str):
         "sharesShort": info.get("sharesShort", ""),
         "heldPercentInsiders": info.get("heldPercentInsiders", ""),
         "heldPercentInstitutions": info.get("heldPercentInstitutions", ""),
-
+        "insider_percentage_development_last_6_months": ticker_obj_insider_purchases.loc[ticker_obj_insider_purchases
+                                                                ['Insider Purchases Last 6m'] ==
+                                                                '% Net Shares Purchased (Sold)', 'Shares'].values[0],
         "trailingPE": info.get("trailingPE", ""),
         "forwardPE": info.get("forwardPE", ""),
         "trailingEps": info.get("trailingEps", ""),
         "forwardEps": info.get("forwardEps", ""),
         "bookValue": info.get("bookValue", ""),
         "totalRevenue": info.get("totalRevenue", ""),
-        "profitMargins": info.get("profitMargins", ""),
         "revenuePerShare": info.get("revenuePerShare", ""),
+        "profitMargins": info.get("profitMargins", ""),
         "totalCash": info.get("totalCash", ""),
         "totalCashPerShare": info.get("totalCashPerShare", ""),
         "totalDebt": info.get("totalDebt", ""),
@@ -52,10 +58,9 @@ def get_stock_info(ticker: str):
         "targetLowPrice": info.get("targetLowPrice", ""),
         "numberOfAnalystOpinions": info.get("numberOfAnalystOpinions", ""),
 
-
     }
 
     return stock_data
 
 
-print(get_stock_info("TSLA"))
+print(get_stock_info("NVDA"))
