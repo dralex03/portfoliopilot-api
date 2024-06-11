@@ -4,11 +4,11 @@ from flask import current_app
 
 from src.config import JWT_EXPIRY, JWT_SECRET_KEY
 
-def encode_auth_token(user_id: int):
+def encode_auth_token(user_id: str):
     """
     Generates the JWT Auth Token.
         Parameters:
-            int user_id;
+            str user_id;
         Returns:
             str: The JWT Token
     """
@@ -36,7 +36,7 @@ def decode_auth_token(auth_token: str):
         Returns:
             tuple:
                 bool: True if the auth token is valid, else False
-                int: the user_id, if the token is valid
+                str: the user_id, if the token is valid
     """
 
     try:

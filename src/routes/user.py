@@ -6,15 +6,18 @@ from src.utils.input_validation import is_valid_email, is_strong_password
 from src.utils import jwt_auth
 from src.constants import http_status_codes as status
 from src.utils.decorators import jwt_required
+from src.routes.user_portfolios import user_portfolios
 
 # Create blueprint which is used in the flask app
 user = Blueprint('user', __name__)
 
-def generate_auth_token_response(user_id: int, success_message: str, success_status: int):
+user.register_blueprint(user_portfolios, url_prefix='/portfolios')
+
+def generate_auth_token_response(user_id: str, success_message: str, success_status: int):
     """
     Generate an authentication token for a given user ID and return the appropriate Flask response.
     Parameters:
-        int user_id;
+        str user_id;
         str success_message;
         int success_status;
     Returns:
@@ -81,7 +84,7 @@ def register():
         hashed_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
         user = queries.add_new_user(user_email, hashed_password.decode())
 
-        return generate_auth_token_response(user.id, 'User created successfully.', status.HTTP_201_CREATED)
+        return generate_auth_token_response(str(user.id), 'User created successfully.', status.HTTP_201_CREATED)
     
     # User already exists
     else:
@@ -116,7 +119,7 @@ def login():
         password_check = bcrypt.checkpw(user_password.encode('utf-8'), user.password.encode('utf-8'))
 
         if user.email == user_email and password_check:
-            return generate_auth_token_response(user.id, 'Login successful.', status.HTTP_200_OK)
+            return generate_auth_token_response(str(user.id), 'Login successful.', status.HTTP_200_OK)
 
     # User does not exist or password is wrong
     response_object = {
@@ -127,11 +130,11 @@ def login():
 
 @user.route('/refresh', methods=['GET'])
 @jwt_required
-def refresh_session(user_id: int):
+def refresh_session(user_id: str):
     """
     Handles GET requests to /user/refresh, used to refresh login sessions
         Parameters:
-            int user_id;
+            str user_id;
         Returns:
             tuple:
                 Response: Flask Response, contains the response_object dict
