@@ -18,6 +18,5 @@ def get_price_data(ticker: str, period: str, interval: str):
     # Reset index to make the DataFrame easier to convert to JSON
     df.reset_index(inplace=True)
 
-    # Convert the DataFrame to JSON
     json_data = df.to_json(orient='records', date_format='iso')
     return json_data

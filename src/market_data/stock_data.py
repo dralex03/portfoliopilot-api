@@ -7,17 +7,16 @@ def get_stock_info(ticker: str):
     Returns specific stock information from yahoo finance
 
     Args:
-        ticker: Stock ticker symbol
+        ticker Stock ticker symbol
 
     Returns:
-        str: JSON with stock information including name, sector, and price data
+        JSON
     """
     ticker_obj = yf.Ticker(ticker)
     info = ticker_obj.info
 
     ticker_obj_insider_purchases = ticker_obj.insider_purchases
 
-    # Create a dictionary to hold the stock data
     stock_data = {
         "ticker": ticker,
         "name": info.get("shortName", ""),
@@ -61,6 +60,3 @@ def get_stock_info(ticker: str):
     }
 
     return stock_data
-
-
-print(get_stock_info("NVDA"))
