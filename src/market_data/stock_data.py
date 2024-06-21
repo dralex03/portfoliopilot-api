@@ -33,8 +33,10 @@ def get_stock_info(ticker: str):
         "heldPercentInsiders": info.get("heldPercentInsiders", ""),
         "heldPercentInstitutions": info.get("heldPercentInstitutions", ""),
         "insider_percentage_development_last_6_months": ticker_obj_insider_purchases.loc[ticker_obj_insider_purchases
-                                                                ['Insider Purchases Last 6m'] ==
-                                                                '% Net Shares Purchased (Sold)', 'Shares'].values[0],
+                                                                                         [
+                                                                                             'Insider Purchases Last 6m'] ==
+                                                                                         '% Net Shares Purchased (Sold)', 'Shares'].values[
+            0],
         "trailingPE": info.get("trailingPE", ""),
         "forwardPE": info.get("forwardPE", ""),
         "trailingEps": info.get("trailingEps", ""),
@@ -60,3 +62,18 @@ def get_stock_info(ticker: str):
     }
 
     return stock_data
+
+
+def get_stock_classification(ticker: str):
+    """
+    Returns the country and sector of a given stock ticker or None if this information is not available
+
+    Args:
+        ticker Stock ticker symbol
+
+    Returns:
+        Tuple Country, String or None, None if this information is not available
+    """
+
+    stock = yf.Ticker(ticker)
+    return stock.info.get('country'), stock.info.get('sector')
