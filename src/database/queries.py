@@ -99,6 +99,16 @@ def add_portfolio(name: str, user_id: str):
     session.add(new_portfolio)
     return new_portfolio
 
+@call_database_function
+def get_portfolio_by_id(portfolio_id: str):
+    """
+    Fetches every portfolio that belongs to a specific user
+        Parameters:
+            str portfolio_id;
+        Returns:
+            Portfolio
+    """
+    return session.query(Portfolio).filter(Portfolio.id == portfolio_id).one()
 
 @call_database_function
 def get_portfolio_by_user_id(user_id: str):

@@ -42,7 +42,7 @@ def jwt_required(func: Callable):
 
                 # If user exists, continue with wrapped function
                 if user:
-                    return func(uid_or_message, *args, **kwargs)
+                    return func(user_id=uid_or_message, *args, **kwargs)
                 else:
                     response_object = {
                         'success': False,

@@ -6,16 +6,50 @@ from sqlalchemy.dialects.postgresql import UUID
 
 Base = declarative_base()
 
+class Model(Base):
+    __abstract__ = True
 
-class User(Base):
+    # Store values that shall be revealed in the json
+    _json_values = []
+
+    def to_json(self):
+        relationships = self.__mapper__.relationships.keys()
+        
+        if len(self._json_values) == 0:
+            self._json_values = self.__table__.columns.keys()
+        
+        json_data = {}
+
+        for key in self._json_values:
+            if key in relationships:
+                is_list = self.__mapper__.relationships[key].uselist
+
+                if is_list:
+                    json_data[key] = []
+                    for item in getattr(self, key):
+                        json_data[key].append(item.toJSON())
+                else:
+                    if self.__mapper__.relationships[key].query_class is not None:
+                        json_data[key] = getattr(self, key).toJSON()
+                    else:
+                        json_data[key] = getattr(self, key)
+            else:
+                json_data[key] = getattr(self, key)
+
+        return json_data
+
+
+class User(Model):
     __tablename__ = 'users'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     portfolios = relationship('Portfolio', back_populates='owner')
 
+    _json_values = ['id', 'email', 'portfolios']
 
-class Portfolio(Base):
+
+class Portfolio(Model):
     __tablename__ = 'portfolios'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
@@ -24,8 +58,10 @@ class Portfolio(Base):
     elements = relationship('PortfolioElement', back_populates='portfolio', cascade='all, delete-orphan')
     __table_args__ = (UniqueConstraint('name', 'user_id', name='portfolio_name_id_uc'),)
 
+    _json_values = ['id', 'name', 'elements']
 
-class PortfolioElement(Base):
+
+class PortfolioElement(Model):
     __tablename__ = 'portfolio_elements'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     count = Column(Float, nullable=False)
@@ -36,8 +72,10 @@ class PortfolioElement(Base):
     asset_id = Column(UUID(as_uuid=True), ForeignKey('assets.id'))
     asset = relationship('Asset', back_populates='portfolio_elements')
 
+    _json_values = ['id', 'count', 'buy_price', 'order_fee', 'portfolio_id', 'asset_id', 'asset']
 
-class Asset(Base):
+
+class Asset(Model):
     __tablename__ = 'assets'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
@@ -48,10 +86,14 @@ class Asset(Base):
     asset_type = relationship('AssetType', back_populates='assets')
     portfolio_elements = relationship('PortfolioElement', back_populates='asset')
 
+    _json_values = ['id', 'name', 'ticker_symbol', 'isin', 'default_currency', 'asset_type']
 
-class AssetType(Base):
+
+class AssetType(Model):
     __tablename__ = 'asset_types'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, unique=True, nullable=False)
     unit_type = Column(String, nullable=False)
     assets = relationship('Asset', back_populates='asset_type')
+
+    _json_values = ['id', 'name', 'unit_type']
