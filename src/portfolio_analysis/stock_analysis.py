@@ -13,12 +13,14 @@ def get_stock_portfolio_distribution(portfolio_id: int):
     Returns:
         Tuple country_weights, sector_weights or None, None if the information is not available
     """
-    tickers = (
-        session.query(Asset.ticker_symbol)
-        .join(PortfolioElement, PortfolioElement.asset_id == Asset.id)
-        .filter(PortfolioElement.portfolio_id == portfolio_id)
-        .all()
-    )
+    tickers = [
+        ticker_symbol for (ticker_symbol,) in (
+            session.query(Asset.ticker_symbol)
+            .join(PortfolioElement, PortfolioElement.asset_id == Asset.id)
+            .filter(PortfolioElement.portfolio_id == portfolio_id)
+            .all()
+        )
+    ]
 
     countries = []
     sectors = []
