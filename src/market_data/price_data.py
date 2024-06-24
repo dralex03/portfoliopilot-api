@@ -10,7 +10,7 @@ def get_price_data(ticker: str, period: str, interval: str):
         interval: (Valid is “1m”, “2m”, “5m”, “15m”, “30m”, “60m”, “90m”, “1h”, “1d”, “5d”, “1wk”, “1mo”, “3mo”)
 
     Returns:
-
+        JSON PriceData object
     """
     ticker_obj = yf.Ticker(ticker)
     df = ticker_obj.history(period=period, interval=interval)
@@ -20,3 +20,4 @@ def get_price_data(ticker: str, period: str, interval: str):
 
     json_data = df.to_json(orient='records', date_format='iso')
     return json_data
+

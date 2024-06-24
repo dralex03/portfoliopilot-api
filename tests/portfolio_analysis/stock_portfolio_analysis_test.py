@@ -23,7 +23,8 @@ def test_get_stock_portfolio_distribution():
     alibaba_stock = insert_new_asset('BABA', new_asset_type.id)
     insert_new_portfolio_element(10.0, new_portfolio.id, alibaba_stock.id)
 
-    test_country_weightings, test_sector_weightings = get_stock_portfolio_distribution(new_portfolio.id)
+    test_country_weightings, test_sector_weightings, test_trailing_pe =(
+        get_stock_portfolio_distribution(new_portfolio.id))
 
     assert len(test_country_weightings) == 3
     assert len(test_sector_weightings) == 2

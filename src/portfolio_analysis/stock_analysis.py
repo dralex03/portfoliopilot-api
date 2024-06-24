@@ -24,15 +24,19 @@ def get_stock_portfolio_distribution(portfolio_id: int):
 
     countries = []
     sectors = []
+    trailing_pes = []
     for ticker in tickers:
-        country, sector = get_stock_classification(ticker)
+        country, sector, trailing_pe = get_stock_classification(ticker)
         if country:
             countries.append(country)
         if sector:
             sectors.append(sector)
+        if trailing_pe:
+            trailing_pes.append(trailing_pe)
 
     sum_of_countries = len(countries)
     sum_of_sectors = len(sectors)
+    avg_trailing_pe = sum(trailing_pes) / len(trailing_pes)
 
     country_counts = Counter(countries)
     sector_counts = Counter(sectors)
@@ -41,6 +45,6 @@ def get_stock_portfolio_distribution(portfolio_id: int):
     country_weights = {country: round((count / sum_of_countries) * 100, 2) for country, count in country_counts.items()}
     sector_weights = {sector: round((count / sum_of_sectors) * 100, 2) for sector, count in sector_counts.items()}
 
-    return country_weights, sector_weights
+    return country_weights, sector_weights, avg_trailing_pe
 
 

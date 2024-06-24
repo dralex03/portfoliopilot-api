@@ -74,5 +74,5 @@ def get_stock_classification(ticker: str):
 
     stock = yf.Ticker(ticker)
     if stock:
-        return stock.info.get('country'), stock.info.get('sector')
+        return stock.info.get('country'), stock.info.get('sector'), stock.info.get('trailingPE')
     return None
