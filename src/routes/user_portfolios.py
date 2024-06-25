@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from src.constants import http_status_codes as status
 from src.database import queries, models
 from src.utils.decorators import jwt_required, validate_portfolio_owner
+from src.utils.responses import *
 
 # Create blueprint which is used in the flask app
 user_portfolios = Blueprint('portfolio', __name__)
@@ -26,18 +27,9 @@ def get_all_user_portfolios(user_id: str):
     try:
         portfolios: list[models.Portfolio] = queries.get_portfolio_by_user_id(user_id)
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': 'Error fetching all portfolios.',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response('Error fetching all portfolios.', e)
 
-    response_object = {
-        'success': True,
-        'response': [p.to_json() for p in portfolios]
-    }
-    return make_response(jsonify(response_object)), status.HTTP_200_OK
+    return generate_success_response([p.to_json() for p in portfolios])
 
 
 @user_portfolios.route('/<portfolio_id>', methods = ['GET'])
@@ -56,11 +48,7 @@ def get_user_portfolio(user_id: str, portfolio: models.Portfolio):
                 int: the response status code
     """
 
-    response_object = {
-        'success': True,
-        'response': portfolio.to_json()
-    }
-    return make_response(jsonify(response_object)), status.HTTP_200_OK
+    return generate_success_response(portfolio.to_json())
 
 
 @user_portfolios.route('/<portfolio_id>', methods = ['DELETE'])
@@ -83,20 +71,11 @@ def delete_user_portfolio(user_id: str, portfolio: models.Portfolio):
     try:
         portfolio_deleted = queries.delete_portfolio_by_id(portfolio.id)
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': f'Error deleting portfolio with ID "{portfolio.id}".',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response(f'Error deleting portfolio with ID "{portfolio.id}".', e)
     
     # Check if portfolio was deleted successfully
     if portfolio_deleted == True:
-        response_object = {
-            'success': True,
-            'response': f'Portfolio with ID "{portfolio.id}" deleted successfully.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_200_OK
+        return generate_success_response(f'Portfolio with ID "{portfolio.id}" deleted successfully.')
     else:
         response_object = {
             'success': False,
@@ -128,24 +107,11 @@ def create_user_portfolio(user_id: str):
     try:
         portfolio: models.Portfolio = queries.add_portfolio(portfolio_name, user_id)
     except IntegrityError as e:
-        response_object = {
-            'success': False,
-            'message': f'Portfolio with name "{portfolio_name}" already exists.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+        return generate_bad_request_response(f'Portfolio with name "{portfolio_name}" already exists.')
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': 'Error creating portfolio.',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response('Error creating portfolio.', e)
 
-    response_object = {
-        'success': True,
-        'response': portfolio.to_json()
-    }
-    return make_response(jsonify(response_object)), status.HTTP_200_OK
+    return generate_success_response(portfolio.to_json())
 
 
 @user_portfolios.route('/<portfolio_id>', methods = ['PUT'])
@@ -173,28 +139,19 @@ def update_user_portfolio(user_id: str, portfolio: models.Portfolio):
     try:
         existing_portfolio = queries.get_portfolio_by_name(user_id, portfolio_name)
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': 'Error updating portfolio.',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response('Error updating portfolio.', e)
     
     if existing_portfolio is not None:
-        response_object = {
-            'success': False,
-            'message': f'Portfolio with name "{portfolio_name}" already exists.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
-    else:
-        # Updating Portfolio Name and sending updated portfolio in response
-        portfolio: models.Portfolio = queries.update_portfolio_name(portfolio.id, portfolio_name)
+        return generate_bad_request_response(f'Portfolio with name "{portfolio_name}" already exists. Please choose another name.')
 
-        response_object = {
-            'success': True,
-            'response': portfolio.to_json()
-        }
-        return make_response(jsonify(response_object)), status.HTTP_200_OK
+
+    # Updating Portfolio Name and sending updated portfolio in response
+    try:
+        portfolio: models.Portfolio = queries.update_portfolio_name(portfolio.id, portfolio_name)
+    except Exception as e:
+        return generate_internal_error_response('Error updating portfolio.', e)
+
+    return generate_success_response(portfolio.to_json())
 
 
 @user_portfolios.route('/<portfolio_id>/add', methods = ['POST'])
@@ -226,18 +183,9 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
     try:
         portfolio_element: models.PortfolioElement = queries.add_portfolio_element(portfolio.id, asset_id, count, buy_price, order_fee)
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': 'Error adding asset to portfolio.',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response('Error adding asset to portfolio.', e)
     
-    response_object = {
-        'success': True,
-        'response': portfolio_element.to_json()
-    }
-    return make_response(jsonify(response_object)), status.HTTP_200_OK
+    return generate_success_response(portfolio_element.to_json())
 
 
 @user_portfolios.route('/<portfolio_id>/<p_element_id>', methods = ['GET'])
@@ -263,18 +211,9 @@ def get_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, p_e
     try:
         portfolio_element: models.PortfolioElement = queries.get_portfolio_element(portfolio.id, p_element_id)
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': 'Error fetching portfolio element.',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response('Error fetching portfolio element.', e)
     
-    response_object = {
-        'success': True,
-        'response': portfolio_element.to_json()
-    }
-    return make_response(jsonify(response_object)), status.HTTP_200_OK
+    return generate_success_response(portfolio_element.to_json())
 
 
 @user_portfolios.route('/<portfolio_id>/<p_element_id>', methods = ['DELETE'])
@@ -300,20 +239,11 @@ def delete_element_from_user_portfolio(user_id: str, portfolio: models.Portfolio
     try:
         element_deleted: models.PortfolioElement = queries.delete_portfolio_element(portfolio.id, p_element_id)
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': 'Error fetching portfolio element.',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response('Error deleting portfolio element.', e)
     
     # Check if portfolio was deleted successfully
     if element_deleted == True:
-        response_object = {
-            'success': True,
-            'response': f'Portfolio Element with ID "{p_element_id}" deleted successfully.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_200_OK
+        return generate_success_response(f'Portfolio Element with ID "{p_element_id}" deleted successfully.')
     else:
         response_object = {
             'success': False,
@@ -325,7 +255,7 @@ def delete_element_from_user_portfolio(user_id: str, portfolio: models.Portfolio
 @user_portfolios.route('/<portfolio_id>/<p_element_id>', methods = ['PUT'])
 @jwt_required
 @validate_portfolio_owner
-def update_asset_of_user_portfolio(user_id: str, portfolio: models.Portfolio, p_element_id: str):
+def update_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, p_element_id: str):
     """
     Handles PUT requests to /user/portfolios/<portfolio_id>/<p_element_id> where
     <portfolio_id> is the ID of a users portfolio and
@@ -354,23 +284,10 @@ def update_asset_of_user_portfolio(user_id: str, portfolio: models.Portfolio, p_
     try:
         portfolio_element: models.PortfolioElement = queries.update_portfolio_element(portfolio.id, p_element_id, count, buy_price, order_fee)
     except Exception as e:
-        response_object = {
-            'success': False,
-            'message': 'Error updating portfolio element.',
-            'error': str(e)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return generate_internal_error_response('Error updating portfolio element.', e)
     
     # Check if the portfolio element was deleted because the count was 0 or less
     if portfolio_element == 'deleted':
-        response_object = {
-            'success': True,
-            'response': f'Portfolio Element with ID "{p_element_id}" was deleted because count was zero or less.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_200_OK
+        return generate_success_response(f'Portfolio Element with ID "{p_element_id}" was deleted because count was zero or less.')
     
-    response_object = {
-        'success': True,
-        'response': portfolio_element.to_json()
-    }
-    return make_response(jsonify(response_object)), status.HTTP_200_OK
+    return generate_success_response(portfolio_element.to_json())

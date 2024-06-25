@@ -3,43 +3,15 @@ from flask import Blueprint, request, make_response, jsonify
 
 from src.database import queries
 from src.utils.input_validation import is_valid_email, is_strong_password
-from src.utils import jwt_auth
 from src.constants import http_status_codes as status
 from src.utils.decorators import jwt_required
+from src.utils.responses import *
 from src.routes.user_portfolios import user_portfolios
 
 # Create blueprint which is used in the flask app
 user = Blueprint('user', __name__)
 
 user.register_blueprint(user_portfolios, url_prefix='/portfolios')
-
-def generate_auth_token_response(user_id: str, success_message: str, success_status: int):
-    """
-    Generate an authentication token for a given user ID and return the appropriate Flask response.
-    Parameters:
-        str user_id;
-        str success_message;
-        int success_status;
-    Returns:
-        tuple:
-            Response: Flask Response, contains the response_object dict
-            int: the response status code
-    """
-    auth_token = jwt_auth.encode_auth_token(user_id)
-
-    if not auth_token:
-        response_object = {
-            'success': False,
-            'message': 'Error generating Auth Token.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
-    
-    response_object = {
-        'success': True,
-        'message': success_message,
-        'auth_token': auth_token
-    }
-    return make_response(jsonify(response_object)), success_status
 
 
 @user.route('/register', methods = ['POST'])
@@ -54,26 +26,18 @@ def register():
                 int: the response status code
     """
 
-    post_data = request.get_json()
-
-    user_email = post_data.get('email')
-    user_password = post_data.get('password')
+    # Parsing the request body
+    request_body = request.get_json()
+    user_email = request_body.get('email')
+    user_password = request_body.get('password')
 
     # Validate email input
     if not is_valid_email(user_email):
-        response_object = {
-            'success': False,
-            'message': 'Invalid Email address.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+        return generate_bad_request_response('Invalid Email address.')
     
     # Validate password input
     if not is_strong_password(user_password):
-        response_object = {
-            'success': False,
-            'message': 'Password does not meet requirements.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+        return generate_bad_request_response('Password does not meet requirements.')
 
     # Check if user already exists
     user = queries.get_user_by_email(user_email)
@@ -84,15 +48,11 @@ def register():
         hashed_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
         user = queries.add_new_user(user_email, hashed_password.decode())
 
-        return generate_auth_token_response(str(user.id), 'User created successfully.', status.HTTP_201_CREATED)
+        return generate_auth_token_response(str(user.id), 'User created successfully.')
     
     # User already exists
     else:
-        response_object = {
-            'success': False,
-            'message': 'User already exists. Please log in.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+        return generate_bad_request_response('User already exists. Please log in.')
 
 @user.route('/login', methods = ['POST'])
 def login():
@@ -106,10 +66,12 @@ def login():
                 int: the response status code
     """
 
-    post_data = request.get_json()
-
-    user_email = post_data.get('email')
-    user_password = post_data.get('password')
+    # Parsing the request body
+    request_body = request.get_json()
+    user_email = request_body.get('email')
+    user_password = request_body.get('password')
+    
+    # TODO: input validation
 
     # Check if user exists
     user = queries.get_user_by_email(user_email)
@@ -119,7 +81,7 @@ def login():
         password_check = bcrypt.checkpw(user_password.encode('utf-8'), user.password.encode('utf-8'))
 
         if user.email == user_email and password_check:
-            return generate_auth_token_response(str(user.id), 'Login successful.', status.HTTP_200_OK)
+            return generate_auth_token_response(str(user.id), 'Login successful.')
 
     # User does not exist or password is wrong
     response_object = {
@@ -142,4 +104,4 @@ def refresh_session(user_id: str):
     """
     
     # Generate a new jwt and return it, as session was already validated by jwt_required decorator
-    return generate_auth_token_response(user_id, 'Session refreshed successfully.', status.HTTP_200_OK)
+    return generate_auth_token_response(user_id, 'Session refreshed successfully.')

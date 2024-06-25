@@ -6,6 +6,7 @@ from flask import request, make_response, jsonify
 
 from src.constants.http_status_codes import HTTP_401_UNAUTHORIZED
 from src.utils.jwt_auth import decode_auth_token
+from src.utils.responses import *
 from src.database import queries, models
 from src.constants import http_status_codes as status
 
@@ -96,7 +97,7 @@ def validate_portfolio_owner(func: Callable):
     @jwt_auth
     @validate_portfolio_owner
     def function(...)
-    
+
         Parameters:
             function func;
         Returns:
@@ -115,19 +116,10 @@ def validate_portfolio_owner(func: Callable):
         try:
             portfolio: models.Portfolio = queries.get_portfolio_by_id(portfolio_id)
         except Exception as e:
-            response_object = {
-                'success': False,
-                'message': f'Error fetching portfolio with ID "{portfolio_id}".',
-                'error': str(e)
-            }
-            return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
+            return generate_internal_error_response(f'Error fetching portfolio with ID "{portfolio_id}".', e)
         
         # Check whether the user owns this portfolio or not
         if str(portfolio.user_id) == user_id:
-            response_object = {
-                'success': True,
-                'response': portfolio.to_json()
-            }
             return func(user_id=user_id, portfolio=portfolio, *args, **kwargs)
         else:
             response_object = {
