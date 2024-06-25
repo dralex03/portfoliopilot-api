@@ -5,6 +5,7 @@ from src.constants import http_status_codes as status
 from src.database import queries, models
 from src.utils.decorators import jwt_required, validate_portfolio_owner
 from src.utils.responses import *
+from src.utils.request_parser import parse_json_request_body
 
 # Create blueprint which is used in the flask app
 user_portfolios = Blueprint('portfolio', __name__)
@@ -99,10 +100,18 @@ def create_user_portfolio(user_id: str):
     """
 
     # Parsing the Request Body
-    request_body = request.get_json()
-    portfolio_name: str = request_body.get('name')
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response('Error Parsing JSON body.', e)
+    
+    portfolio_name = request_body.get('name')
 
-    # TODO: input validation
+    # Validating field types
+    if not isinstance(portfolio_name, str):
+        return generate_bad_request_response('Field "name" needs to be a string.')
 
     try:
         portfolio: models.Portfolio = queries.add_portfolio(portfolio_name, user_id)
@@ -130,10 +139,18 @@ def update_user_portfolio(user_id: str, portfolio: models.Portfolio):
     """
     
     # Parsing the request body
-    request_body = request.get_json()
-    portfolio_name: str = request_body.get('name')
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response('Error Parsing JSON body.', e)
     
-    # TODO: input validation
+    portfolio_name = request_body.get('name')
+    
+    # Validating field types
+    if not isinstance(portfolio_name, str):
+        return generate_bad_request_response('Field "name" needs to be a string.')
 
     # Checking if user already owns a portfolio with this name
     try:
@@ -171,13 +188,28 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
     """
 
     # Parsing the request body
-    request_body = request.get_json()
-    asset_id: float = request_body.get('asset_id')
-    count: float = request_body.get('count')
-    buy_price: float = request_body.get('buy_price')
-    order_fee: float = request_body.get('order_fee')
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response('Error Parsing JSON body.', e)
+    
+    
+    asset_id = request_body.get('asset_id')
+    count = request_body.get('count')
+    buy_price = request_body.get('buy_price')
+    order_fee = request_body.get('order_fee')
 
-    # TODO: input validation
+    # Validating field types
+    if not isinstance(asset_id, str):
+        return generate_bad_request_response('Field "asset_id" needs to be a string.')
+    if not isinstance(count, float):
+        return generate_bad_request_response('Field "count" needs to be a float.')
+    if not isinstance(buy_price, float):
+        return generate_bad_request_response('Field "buy_price" needs to be a float.')
+    if not isinstance(order_fee, float):
+        return generate_bad_request_response('Field "order_fee" needs to be a float.')
 
     # Trying to add the element to the portfolio
     try:
@@ -273,12 +305,25 @@ def update_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, 
 
     # Parsing the request body
     # TODO: default values to None
-    request_body = request.get_json()
-    count: float = request_body.get('count')
-    buy_price: float = request_body.get('buy_price')
-    order_fee: float = request_body.get('order_fee')
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response('Error Parsing JSON body.', e)
+    
+    
+    count = request_body.get('count')
+    buy_price = request_body.get('buy_price')
+    order_fee = request_body.get('order_fee')
 
-    # TODO: input validation
+    # Validating field types
+    if not isinstance(count, float):
+        return generate_bad_request_response('Field "count" needs to be a float.')
+    if not isinstance(buy_price, float):
+        return generate_bad_request_response('Field "buy_price" needs to be a float.')
+    if not isinstance(order_fee, float):
+        return generate_bad_request_response('Field "order_fee" needs to be a float.')
     
     # Trying to update the portfolio element
     try:

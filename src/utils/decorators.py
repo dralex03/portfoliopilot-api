@@ -93,8 +93,8 @@ def validate_portfolio_owner(func: Callable):
     Wrapper function for every API request that includes a portfolio_id to check
     that the user_id from authentication is the owner of this portfolio.
 
-    Needs to be used in combination with @jwt_auth decorator, in the following order:
-    @jwt_auth
+    Needs to be used in combination with @jwt_required decorator, in the following order:
+    @jwt_required
     @validate_portfolio_owner
     def function(...)
 

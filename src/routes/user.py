@@ -2,10 +2,12 @@ import bcrypt
 from flask import Blueprint, request, make_response, jsonify
 
 from src.database import queries
+from src.database.models import User
 from src.utils.input_validation import is_valid_email, is_strong_password
 from src.constants import http_status_codes as status
 from src.utils.decorators import jwt_required
 from src.utils.responses import *
+from src.utils.request_parser import *
 from src.routes.user_portfolios import user_portfolios
 
 # Create blueprint which is used in the flask app
@@ -27,9 +29,21 @@ def register():
     """
 
     # Parsing the request body
-    request_body = request.get_json()
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response('Error Parsing JSON body.', e)
+
     user_email = request_body.get('email')
     user_password = request_body.get('password')
+
+    # Validating field types
+    if not isinstance(user_email, str):
+        return generate_bad_request_response('Field "email" needs to be a string.')
+    if not isinstance(user_password, str):
+        return generate_bad_request_response('Field "password" needs to be a string.')
 
     # Validate email input
     if not is_valid_email(user_email):
@@ -40,13 +54,20 @@ def register():
         return generate_bad_request_response('Password does not meet requirements.')
 
     # Check if user already exists
-    user = queries.get_user_by_email(user_email)
+    try:
+        user: User = queries.get_user_by_email(user_email)
+    except Exception as e:
+        return generate_internal_error_response('Error finding user.', e)
 
     # User does not exist yet
     if not user:
         # Hash password with bcrypt and insert new user into database
         hashed_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
-        user = queries.add_new_user(user_email, hashed_password.decode())
+
+        try:
+            user: User = queries.add_new_user(user_email, hashed_password.decode())
+        except Exception as e:
+            return generate_internal_error_response('Error creating user.', e)
 
         return generate_auth_token_response(str(user.id), 'User created successfully.')
     
@@ -67,14 +88,27 @@ def login():
     """
 
     # Parsing the request body
-    request_body = request.get_json()
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response('Error Parsing JSON body.', e)
+    
     user_email = request_body.get('email')
     user_password = request_body.get('password')
-    
-    # TODO: input validation
+
+    # Validating field types
+    if not isinstance(user_email, str):
+        return generate_bad_request_response('Field "email" needs to be a string.')
+    if not isinstance(user_password, str):
+        return generate_bad_request_response('Field "password" needs to be a string.')
 
     # Check if user exists
-    user = queries.get_user_by_email(user_email)
+    try:
+        user: User = queries.get_user_by_email(user_email)
+    except Exception as e:
+        return generate_internal_error_response('Error finding user.', e)
 
     # User does exist
     if user:
