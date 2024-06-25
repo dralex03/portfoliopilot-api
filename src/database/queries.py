@@ -39,6 +39,7 @@ def get_user_by_email(email: str):
     """
     return session.query(User).filter(User.email == email).first()
 
+
 @call_database_function
 def get_user_by_id(id: str):
     """
@@ -49,6 +50,7 @@ def get_user_by_id(id: str):
             User
     """
     return session.query(User).filter(User.id == id).one()
+
 
 @call_database_function
 def add_new_user(email: str, password: str):
@@ -65,6 +67,7 @@ def add_new_user(email: str, password: str):
     return new_user
 
 
+# TODO: not used yet
 @call_database_function
 def delete_user_by_id(user_id: str):
     """
@@ -99,6 +102,7 @@ def add_portfolio(name: str, user_id: str):
     session.add(new_portfolio)
     return new_portfolio
 
+
 @call_database_function
 def get_portfolio_by_id(portfolio_id: str):
     """
@@ -109,6 +113,19 @@ def get_portfolio_by_id(portfolio_id: str):
             Portfolio
     """
     return session.query(Portfolio).filter(Portfolio.id == portfolio_id).one()
+
+
+@call_database_function
+def get_portfolio_by_name(user_id: str, portfolio_name: str):
+    """
+    Fetches a portfolio by name for a specific user id
+        Parameters:
+            str portfolio_name;
+        Returns:
+            Portfolio
+    """
+    return session.query(Portfolio).filter(Portfolio.user_id == user_id, Portfolio.name == portfolio_name).first()
+
 
 @call_database_function
 def get_portfolio_by_user_id(user_id: str):
@@ -140,9 +157,27 @@ def delete_portfolio_by_id(portfolio_id: str):
 
 
 @call_database_function
+def update_portfolio_name(portfolio_id: str, new_portfolio_name: str):
+    """
+    Fetches a portfolio by name for a specific user id
+        Parameters:
+            str portfolio_id;
+            str new_portfolio_name;
+        Returns:
+            Portfolio
+    """
+
+    existing_portfolio = session.query(Portfolio).filter(Portfolio.id == portfolio_id).first()
+    existing_portfolio.name = new_portfolio_name
+
+    return existing_portfolio
+
+
+@call_database_function
 def add_portfolio_element(portfolio_id: str, asset_id: str, count: float, buy_price: float, order_fee: float):
     """
-    Adds the passed portfolio element to the passed portfolio
+    Adds the passed portfolio element to the passed portfolio.
+    If the portfolio already contains an element from that asset, the numbers are just updated.
         Parameters:
             str portfolio_id;
             str asset_id;
@@ -171,7 +206,21 @@ def add_portfolio_element(portfolio_id: str, asset_id: str, count: float, buy_pr
 
 
 @call_database_function
-def get_portfolio_element(portfolio_id: str):
+def get_portfolio_element(portfolio_id: str, p_element_id: str):
+    """
+    Fetches a single PortfolioElement that belongs to a specific portfolio.
+        Parameters:
+            str portfolio_id;
+            str p_element_id;
+        Returns:
+            PortfolioElement
+    """
+    return session.query(PortfolioElement).filter(PortfolioElement.portfolio_id == portfolio_id, PortfolioElement.id == p_element_id).one()
+
+
+# TODO: not used yet
+@call_database_function
+def get_portfolio_all_elements(portfolio_id: str):
     """
     Fetches every PortfolioElement that belongs to a user and portfolio.
         Parameters:
@@ -183,42 +232,58 @@ def get_portfolio_element(portfolio_id: str):
 
 
 @call_database_function
-def delete_portfolio_element(portfolio_element_id: str):
+def delete_portfolio_element(portfolio_id: str, p_element_id: str):
     """
-    Deletes the portfolio element corresponding to the passed id
+    Deletes the portfolio element corresponding to the passed id and the portfolio ID.
         Parameters:
-            str portfolio_element_id;
+            str portfolio_id;
+            str p_element_id;
         Returns:
-            Boolean True if the Portfolio_element was successfully deleted, False otherwise
+            Boolean True if the portfolio element was successfully deleted, False otherwise
     """
-    target_portfolio_element = session.query(PortfolioElement).filter_by(id=portfolio_element_id).first()
-    if target_portfolio_element:
-        session.delete(target_portfolio_element)
-        return False
+    portfolio_element = session.query(PortfolioElement).filter(PortfolioElement.id == p_element_id, PortfolioElement.portfolio_id == portfolio_id).first()
+    if portfolio_element:
+        session.delete(portfolio_element)
+        return True
     else:
         return False
 
 
 @call_database_function
-def reduce_portfolio_element(portfolio_id: str, asset_id: str, count: float):
+def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float = None, buy_price: float = None, order_fee: float = None):
     """
-    Reduces the count of a portfolio item from the transferred portfolio
+    Updates the details of a specific portfolio element
         Parameters:
             str portfolio_id;
-            str asset_id;
+            str p_element_id;
             float count;
+            float buy_price;
+            float order_fee;
         Returns:
             PortfolioElement
     """
-    target_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id,
-                                                                         asset_id=asset_id).one()
-    if 0 < count < target_portfolio_element.count:
-        target_portfolio_element.count = target_portfolio_element.count - count
-    else:
-        session.delete(target_portfolio_element)
-    return target_portfolio_element
+    portfolio_element = session.query(PortfolioElement).filter(PortfolioElement.id == p_element_id, PortfolioElement.portfolio_id == portfolio_id).one()
+
+    # Update count if existent and greater than 0, else delete the element
+    if count is not None:
+        if count > 0:
+            portfolio_element.count = count
+        else:
+            session.delete(portfolio_element)
+            return 'deleted'
+    
+    # Update buy price if existent
+    if buy_price is not None and buy_price > 0:
+        portfolio_element.buy_price = buy_price
+
+    # Update order fee if existent
+    if order_fee is not None and order_fee >= 0:
+        portfolio_element.order_fee = order_fee
+
+    return portfolio_element
 
 
+# TODO: not used yet
 @call_database_function
 def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: str, asset_type_id: str):
     """
@@ -241,6 +306,7 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
         return None
 
 
+# TODO: not used yet
 @call_database_function
 def get_asset_by_name(name: str):
     """
@@ -253,6 +319,7 @@ def get_asset_by_name(name: str):
     return session.query(Asset).filter_by(name=name).one()
 
 
+# TODO: not used yet
 @call_database_function
 def delete_asset(asset_id: str):
     """
@@ -269,6 +336,8 @@ def delete_asset(asset_id: str):
     else:
         return False
 
+
+# TODO: not used yet
 @call_database_function
 def add_new_asset_type(name: str, unit_type: str):
     """
@@ -284,6 +353,7 @@ def add_new_asset_type(name: str, unit_type: str):
     return new_asset_type
 
 
+# TODO: not used yet
 @call_database_function
 def get_asset_type_by_name(name: str):
     """
@@ -295,6 +365,8 @@ def get_asset_type_by_name(name: str):
     """
     return session.query(AssetType).filter_by(name=name).one()
 
+
+# TODO: not used yet
 @call_database_function
 def delete_asset_type(asset_type_id: str):
     """
