@@ -14,17 +14,4 @@ def get_alternative_info(ticker: str):
     resource = yf.Ticker(ticker)
     resource_info = resource.info
 
-    resource_data = {
-        "shortName": resource_info.get("shortName", ""),
-        "quoteType": resource_info.get("quoteType", ""),
-        "expireDate": resource_info.get("expireDate", ""),
-        "maxAge": resource_info.get("maxAge", ""),  # indicates how old the data is
-        "priceHint": resource_info.get("priceHint", ""),  # indicates precision of Data
-        "previousClose": resource_info.get("previousClose", ""),
-        "open": resource_info.get("open", ""),
-        "dayLow": resource_info.get("dayLow", ""),
-        "volume": resource_info.get("volume", ""),
-        "averageVolume": resource_info.get("averageVolume", "")
-    }
-
-    return resource_data
+    return resource_info
