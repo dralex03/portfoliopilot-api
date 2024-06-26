@@ -26,6 +26,7 @@ class ApiErrors:
     """
 
     invalid_json = 'Error Parsing JSON body.'
+    body_is_not_json = 'Request body needs to be JSON.'
 
     @staticmethod
     def field_wrong_type(field_name: str, type: str) -> str:

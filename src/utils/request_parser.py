@@ -1,5 +1,7 @@
 from flask import Request
 
+from src.constants.errors import ApiErrors
+
 def parse_json_request_body(request: Request):
     """
     Parses a JSON request body from a flask request.
@@ -11,14 +13,11 @@ def parse_json_request_body(request: Request):
         ValueError: If parsing the body fails.
     """
     if not request.is_json:
-        raise ValueError('Request body needs to be JSON.')
+        raise ValueError(ApiErrors.body_is_not_json)
 
     try:
         request_body = request.get_json()
     except Exception as e:
         raise e
-    
-    if request_body is None:
-        raise ValueError('No JSON data provided.')
     
     return request_body
