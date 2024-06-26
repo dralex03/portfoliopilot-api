@@ -6,6 +6,9 @@ from src.config import DATABASE_URL
 #  Creates a base class for all ORM models
 engine = create_engine(DATABASE_URL)
 
+if not engine.url.get_backend_name() == 'postgresql+psycopg2':
+    raise RuntimeError('Use PostgreSQL database to run production/dev!')
+
 #  Creates a session that gives query function context on which database they need to perform operations
 Session = sessionmaker(bind=engine)
 session = Session()
