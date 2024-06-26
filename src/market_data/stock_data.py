@@ -32,8 +32,10 @@ def get_stock_info(ticker: str):
         "heldPercentInsiders": info.get("heldPercentInsiders", ""),
         "heldPercentInstitutions": info.get("heldPercentInstitutions", ""),
         "insider_percentage_development_last_6_months": ticker_obj_insider_purchases.loc[ticker_obj_insider_purchases
-                                                                ['Insider Purchases Last 6m'] ==
-                                                                '% Net Shares Purchased (Sold)', 'Shares'].values[0],
+                                                                                         [
+                                                                                             'Insider Purchases Last 6m'] ==
+                                                                                         '% Net Shares Purchased (Sold)', 'Shares'].values[
+            0],
         "trailingPE": info.get("trailingPE", ""),
         "forwardPE": info.get("forwardPE", ""),
         "trailingEps": info.get("trailingEps", ""),
