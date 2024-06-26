@@ -250,7 +250,8 @@ def delete_portfolio_element(portfolio_id: str, p_element_id: str):
 
 
 @call_database_function
-def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float = None, buy_price: float = None, order_fee: float = None):
+def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float = None, buy_price: float = None,
+                             order_fee: float = None):
     """
     Updates the details of a specific portfolio element
         Parameters:
@@ -262,7 +263,7 @@ def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float 
         Returns:
             PortfolioElement
     """
-    portfolio_element = session.query(PortfolioElement).filter(PortfolioElement.id == p_element_id, PortfolioElement.portfolio_id == portfolio_id).one()
+    portfolio_element = session.query(PortfolioElement).filter_by(id=p_element_id, portfolio_id=portfolio_id).one()
 
     # Update count if existent and greater than 0, else delete the element
     if count is not None:
@@ -329,7 +330,7 @@ def delete_asset(asset_id: str):
         Returns:
             Boolean True if the Asset was successfully deleted, False otherwise
     """
-    target_asset = session.query(Asset).filter_by(asset_type_id=asset_id).first()
+    target_asset = session.query(Asset).filter_by(id=asset_id).first()
     if target_asset:
         session.delete(target_asset)
         return True

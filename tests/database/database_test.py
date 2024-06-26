@@ -127,7 +127,7 @@ def test_portfolio_element_update():
     new_portfolio = insert_new_portfolio(NAME, new_user.id)
     new_portfolio_element = insert_new_portfolio_element(10.0, new_portfolio.id, new_asset.id)
 
-    update_portfolio_element(new_portfolio.id, new_asset.id, 5.0)
+    update_portfolio_element(new_portfolio.id, new_portfolio_element.id, 5.0)
 
     fetched_portfolio_element = session.query(PortfolioElement).filter_by(id=new_portfolio_element.id).first()
     assert fetched_portfolio_element is not None
@@ -218,7 +218,7 @@ def test_consequences_of_portfolio_deletion():
     fetched_asset = session.query(Asset).filter_by(id=new_asset.id).first()
     assert fetched_asset is not None
 
-    fetched_asset_type = session.query(Asset).filter_by(id=new_asset_type.id).first()
+    fetched_asset_type = session.query(AssetType).filter_by(id=new_asset_type.id).first()
     assert fetched_asset_type is not None
 
 
@@ -252,7 +252,7 @@ def test_asset_deletion():
     delete_asset(new_asset.id)
 
     with pytest.raises(Exception):
-        get_asset_by_name(new_asset.name)
+        get_asset_by_name(NAME)
 
 
 def test_asset_type_insertion():
