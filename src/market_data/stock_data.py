@@ -6,7 +6,7 @@ def get_stock_info(ticker: str):
     Returns specific stock information from yahoo finance
 
     Args:
-        ticker Stock ticker symbol
+        str ticker
 
     Returns:
         JSON
