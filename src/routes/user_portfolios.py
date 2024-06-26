@@ -113,6 +113,10 @@ def create_user_portfolio(user_id: str):
     if not isinstance(portfolio_name, str):
         return generate_bad_request_response('Field "name" needs to be a string.')
 
+    # Validating field values
+    if not len(portfolio_name) > 0:
+        return generate_bad_request_response('Field "name" can not be empty.')
+
     try:
         portfolio: models.Portfolio = queries.add_portfolio(portfolio_name, user_id)
     except IntegrityError as e:
@@ -151,6 +155,10 @@ def update_user_portfolio(user_id: str, portfolio: models.Portfolio):
     # Validating field types
     if not isinstance(portfolio_name, str):
         return generate_bad_request_response('Field "name" needs to be a string.')
+
+    # Validating field values
+    if not len(portfolio_name) > 0:
+        return generate_bad_request_response('Field "name" can not be empty.')
 
     # Checking if user already owns a portfolio with this name
     try:
@@ -210,6 +218,14 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
         return generate_bad_request_response('Field "buy_price" needs to be a float.')
     if not isinstance(order_fee, float):
         return generate_bad_request_response('Field "order_fee" needs to be a float.')
+    
+    # Validating field values
+    if count <= 0:
+        return generate_bad_request_response('Field "count" needs to be greater than 0.')
+    if buy_price <= 0:
+        return generate_bad_request_response('Field "buy_price" needs to be greater than 0.')
+    if order_fee < 0:
+        return generate_bad_request_response('Field "order_fee" needs to be 0 or greater.')
 
     # Trying to add the element to the portfolio
     try:
@@ -324,6 +340,14 @@ def update_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, 
         return generate_bad_request_response('Field "buy_price" needs to be a float.')
     if not isinstance(order_fee, float):
         return generate_bad_request_response('Field "order_fee" needs to be a float.')
+    
+    # Validating field values
+    if count <= 0:
+        return generate_bad_request_response('Field "count" needs to be greater than 0.')
+    if buy_price <= 0:
+        return generate_bad_request_response('Field "buy_price" needs to be greater than 0.')
+    if order_fee < 0:
+        return generate_bad_request_response('Field "order_fee" needs to be 0 or greater.')
     
     # Trying to update the portfolio element
     try:
