@@ -211,6 +211,14 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
     buy_price = request_body.get('buy_price')
     order_fee = request_body.get('order_fee')
 
+    # Convert ints to floats
+    if isinstance(count, int):
+        count = float(count)
+    if isinstance(buy_price, int):
+        buy_price = float(buy_price)
+    if isinstance(order_fee, int):
+        order_fee = float(order_fee)
+
     # Validating field types
     if not isinstance(asset_id, str):
         return generate_bad_request_response(ApiErrors.field_wrong_type('asset_id', 'string'))
@@ -334,6 +342,15 @@ def update_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, 
     count = request_body.get('count', None)
     buy_price = request_body.get('buy_price', None)
     order_fee = request_body.get('order_fee', None)
+
+    # Convert ints to floats
+    if isinstance(count, int):
+        count = float(count)
+    if isinstance(buy_price, int):
+        buy_price = float(buy_price)
+    if isinstance(order_fee, int):
+        order_fee = float(order_fee)
+
 
     # Validating field types
     if not isinstance(count, float) and count is not None:
