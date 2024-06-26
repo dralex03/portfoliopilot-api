@@ -47,3 +47,14 @@ JWT_SECRET_KEY=super_secret_key
 
 ## Start the API application
   * Run the following command on repository level to start the application: `python . run`
+
+
+## Running Tests
+
+Simply run `pytest` in the root directory to run all available tests.
+
+To see coverage of the implemented tests, run the following commands in the root directory:
+1. `coverage run -m pytest`
+2. `coverage report -m`
+
+For more details see the official [Coverage Documentation](https://coverage.readthedocs.io/en/7.5.4/).

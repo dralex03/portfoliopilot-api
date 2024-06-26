@@ -1,17 +1,24 @@
 import pytest
-from src.database.setup import engine
-from src.database.models import Base
+
 from src.database.queries import *
+from src.database.setup import engine, Session
+from src.database.models import *
 
 
 @pytest.fixture(scope='function', autouse=True)
-def setup_and_teardown_database():
-    # This will run before each test
+def setup_session():
+    # Check for SQLite for test environment
+    if not engine.url.get_backend_name() == 'sqlite':
+        raise RuntimeError('Use SQLite Database to run tests')
+    
     Base.metadata.create_all(engine)
-    yield
-    # This will run after each test
-    session.close()
-    Base.metadata.drop_all(engine)
+    try:
+        # Creates a session and gives it to the testing function
+        with Session() as session:
+            yield session
+    finally:
+        # Cleans up database after tests have run
+        Base.metadata.drop_all(engine)
 
 
 def insert_new_user(name: str):
@@ -21,14 +28,14 @@ def insert_new_user(name: str):
     return new_user
 
 
-def insert_new_portfolio(name: str, user_id: int):
+def insert_new_portfolio(name: str, user_id: str):
     new_portfolio = Portfolio(name=name, user_id=user_id)
     session.add(new_portfolio)
     session.commit()
     return new_portfolio
 
 
-def insert_new_portfolio_element(value: float, portfolio_id: int, asset_id: int):
+def insert_new_portfolio_element(value: float, portfolio_id: str, asset_id: str):
     new_portfolio_element = PortfolioElement(portfolio_id=portfolio_id, asset_id=asset_id, count=value,
                                              buy_price=value, order_fee=value)
     session.add(new_portfolio_element)
@@ -36,7 +43,7 @@ def insert_new_portfolio_element(value: float, portfolio_id: int, asset_id: int)
     return new_portfolio_element
 
 
-def insert_new_asset(name: str, asset_type_id: int):
+def insert_new_asset(name: str, asset_type_id: str):
     new_asset = Asset(name=name, ticker_symbol=name, isin=name, default_currency=name,
                       asset_type_id=asset_type_id)
     session.add(new_asset)
@@ -112,7 +119,7 @@ def test_portfolio_element_insertion():
     assert fetched_portfolio_element.order_fee == 10.0
 
 
-def test_portfolio_element_removal():
+def test_portfolio_element_update():
     NAME = 'TPER'
     new_asset_type = insert_new_asset_type(NAME)
     new_asset = insert_new_asset(NAME, new_asset_type.id)
@@ -120,7 +127,7 @@ def test_portfolio_element_removal():
     new_portfolio = insert_new_portfolio(NAME, new_user.id)
     new_portfolio_element = insert_new_portfolio_element(10.0, new_portfolio.id, new_asset.id)
 
-    reduce_portfolio_element(new_portfolio.id, new_asset.id, 5.0)
+    update_portfolio_element(new_portfolio.id, new_asset.id, 5.0)
 
     fetched_portfolio_element = session.query(PortfolioElement).filter_by(id=new_portfolio_element.id).first()
     assert fetched_portfolio_element is not None
@@ -129,7 +136,7 @@ def test_portfolio_element_removal():
     assert fetched_portfolio_element.count == 5.0
 
 
-def test_get_portfolio_element():
+def test_get_portfolio_all_elements():
     FIRST_NAME = 'TGP1'
     SECOND_NAME = 'TGP2'
 
@@ -143,7 +150,7 @@ def test_get_portfolio_element():
     insert_new_portfolio_element(10.0, new_portfolio.id, new_asset_1.id)
     insert_new_portfolio_element(20.0, new_portfolio.id, new_asset_2.id)
 
-    fetched_portfolio_elements = get_portfolio_element(new_portfolio.id)
+    fetched_portfolio_elements = get_portfolio_all_elements(new_portfolio.id)
 
     assert fetched_portfolio_elements is not None
     assert len(fetched_portfolio_elements) == 2
@@ -160,7 +167,7 @@ def test_portfolio_element_deletion():
     new_portfolio = insert_new_portfolio(NAME, new_user.id)
     new_portfolio_element = insert_new_portfolio_element(10.0, new_portfolio.id, new_asset.id)
 
-    delete_portfolio_element(new_portfolio_element.id)
+    delete_portfolio_element(new_portfolio.id, new_portfolio_element.id)
 
     fetched_portfolio_element = session.query(PortfolioElement).filter_by(portfolio_id=new_portfolio.id,
                                                                           asset_id=new_asset.id).first()
