@@ -11,7 +11,7 @@ def get_alternative_info(ticker: str):
     Returns:
         Json object
     """
-    bond = yf.Ticker(ticker)
-    bond_info = bond.info
-    return bond_info
+    resource = yf.Ticker(ticker)
+    resource_info = resource.info
 
+    return resource_info

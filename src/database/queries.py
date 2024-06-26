@@ -37,7 +37,8 @@ def get_user_by_email(email: str):
         Returns:
             User
     """
-    return session.query(User).filter(User.email == email).first()
+    return session.query(User).filter_by(email=email).first()
+
 
 @call_database_function
 def get_user_by_id(id: int):
@@ -48,7 +49,8 @@ def get_user_by_id(id: int):
         Returns:
             User
     """
-    return session.query(User).filter(User.id == id).one()
+    return session.query(User).filter_by(id=id).one()
+
 
 @call_database_function
 def add_new_user(email: str, password: str):
@@ -74,7 +76,7 @@ def delete_user_by_id(user_id: int):
         Returns:
             Boolean True if the user was successfully deleted, False otherwise
     """
-    user_to_delete = session.query(User).filter(User.id == user_id).first()
+    user_to_delete = session.query(User).filter_by(id=user_id).first()
     if user_to_delete:
         session.delete(user_to_delete)
         return True
@@ -109,7 +111,7 @@ def get_portfolio_by_user_id(user_id: int):
         Returns:
             List[Portfolio]
     """
-    return session.query(Portfolio).filter(Portfolio.user_id == user_id).all()
+    return session.query(Portfolio).filter_by(user_id=user_id).all()
 
 
 @call_database_function
@@ -170,7 +172,7 @@ def get_portfolio_element(portfolio_id: int):
         Returns:
             List[PortfolioElement]
     """
-    return session.query(PortfolioElement).filter(PortfolioElement.portfolio_id == portfolio_id).all()
+    return session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id).all()
 
 
 @call_database_function
@@ -260,6 +262,7 @@ def delete_asset(asset_id: int):
     else:
         return False
 
+
 @call_database_function
 def add_new_asset_type(name: str, unit_type: str):
     """
@@ -285,6 +288,7 @@ def get_asset_type_by_name(name: str):
            AssetType
     """
     return session.query(AssetType).filter_by(name=name).one()
+
 
 @call_database_function
 def delete_asset_type(asset_type_id: int):
