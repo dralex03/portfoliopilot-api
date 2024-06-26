@@ -9,21 +9,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:latest
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
     - name: Check out repository code
       uses: actions/checkout@v2
@@ -38,11 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Wait for PostgreSQL to start
-      run: sleep 30
-
     - name: Run tests
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost/test_db
+        DATABASE_URL: "sqlite:///:memory:"
+        FLASK_APP: src
+        JWT_SECRET_KEY: super_secret_key
       run: |
         pytest
