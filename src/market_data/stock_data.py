@@ -19,7 +19,7 @@ def get_stock_info(ticker: str):
     insider_data = ticker_obj_insider_purchases.to_dict(orient='records')
     info['insider_transactions'] = insider_data
 
-    return info, ticker_obj_insider_purchases
+    return info
 
 
 def get_stock_classification(ticker: str):
