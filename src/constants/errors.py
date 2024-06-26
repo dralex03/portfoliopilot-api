@@ -65,6 +65,7 @@ class ApiErrors:
 
         # Query Errors
         get_user_by_email_error = 'Error finding user.'
+        get_user_by_id_error = 'Error finding user.'
         add_new_user_error = 'Error creating user.'
 
         # Register
