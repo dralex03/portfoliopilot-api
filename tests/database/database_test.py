@@ -1,64 +1,14 @@
 import pytest
+from sqlalchemy.orm.session import Session
 
 from src.database.queries import *
-from src.database.setup import engine, Session
 from src.database.models import *
 
-
-@pytest.fixture(scope='function', autouse=True)
-def setup_session():
-    # Check for SQLite for test environment
-    if not engine.url.get_backend_name() == 'sqlite':
-        raise RuntimeError('Use SQLite Database to run tests')
-    
-    Base.metadata.create_all(engine)
-    try:
-        # Creates a session and gives it to the testing function
-        with Session() as session:
-            yield session
-    finally:
-        # Cleans up database after tests have run
-        Base.metadata.drop_all(engine)
+from tests.database.conftest import session
+from tests.database.helper_queries import *
 
 
-def insert_new_user(name: str):
-    new_user = User(email=name, password=name)
-    session.add(new_user)
-    session.commit()
-    return new_user
-
-
-def insert_new_portfolio(name: str, user_id: str):
-    new_portfolio = Portfolio(name=name, user_id=user_id)
-    session.add(new_portfolio)
-    session.commit()
-    return new_portfolio
-
-
-def insert_new_portfolio_element(value: float, portfolio_id: str, asset_id: str):
-    new_portfolio_element = PortfolioElement(portfolio_id=portfolio_id, asset_id=asset_id, count=value,
-                                             buy_price=value, order_fee=value)
-    session.add(new_portfolio_element)
-    session.commit()
-    return new_portfolio_element
-
-
-def insert_new_asset(name: str, asset_type_id: str):
-    new_asset = Asset(name=name, ticker_symbol=name, isin=name, default_currency=name,
-                      asset_type_id=asset_type_id)
-    session.add(new_asset)
-    session.commit()
-    return new_asset
-
-
-def insert_new_asset_type(name: str):
-    new_asset_type = AssetType(name=name, unit_type=name)
-    session.add(new_asset_type)
-    session.commit()
-    return new_asset_type
-
-
-def test_user_insertion():
+def test_user_insertion(session: Session):
     USER_EMAIL = 'UR@example.com'
     PASSWORD = '<PASSWORD>'
     add_new_user(USER_EMAIL, PASSWORD)
@@ -71,7 +21,7 @@ def test_user_insertion():
         add_new_user(USER_EMAIL, PASSWORD)
 
 
-def test_user_deletion():
+def test_user_deletion(session: Session):
     new_user = insert_new_user('UD')
 
     delete_user_by_id(new_user.id)
@@ -80,7 +30,7 @@ def test_user_deletion():
     assert fetched_user is None
 
 
-def test_get_user_by_email():
+def test_get_user_by_email(session: Session):
     new_user = insert_new_user('TGUBE')
 
     user = get_user_by_email(new_user.email)
@@ -88,7 +38,7 @@ def test_get_user_by_email():
     assert user.email == new_user.email
 
 
-def test_portfolio_insertion():
+def test_portfolio_insertion(session: Session):
     new_user = insert_new_user('TPI')
 
     PORTFOLIO_NAME = 'Welt portfolio'
@@ -100,7 +50,7 @@ def test_portfolio_insertion():
     assert fetched_portfolio.user_id == new_user.id
 
 
-def test_portfolio_element_insertion():
+def test_portfolio_element_insertion(session: Session):
     NAME = 'TPEI'
     new_asset_type = insert_new_asset_type(NAME)
     new_asset = insert_new_asset(NAME, new_asset_type.id)
@@ -119,7 +69,7 @@ def test_portfolio_element_insertion():
     assert fetched_portfolio_element.order_fee == 10.0
 
 
-def test_portfolio_element_update():
+def test_portfolio_element_update(session: Session):
     NAME = 'TPER'
     new_asset_type = insert_new_asset_type(NAME)
     new_asset = insert_new_asset(NAME, new_asset_type.id)
@@ -136,7 +86,7 @@ def test_portfolio_element_update():
     assert fetched_portfolio_element.count == 5.0
 
 
-def test_get_portfolio_all_elements():
+def test_get_portfolio_all_elements(session: Session):
     FIRST_NAME = 'TGP1'
     SECOND_NAME = 'TGP2'
 
@@ -159,7 +109,7 @@ def test_get_portfolio_all_elements():
     assert (portfolio.order_fee == 20.0 for portfolio in fetched_portfolio_elements)
 
 
-def test_portfolio_element_deletion():
+def test_portfolio_element_deletion(session: Session):
     NAME = 'TPED'
     new_asset_type = insert_new_asset_type(NAME)
     new_asset = insert_new_asset(NAME, new_asset_type.id)
@@ -174,7 +124,7 @@ def test_portfolio_element_deletion():
     assert fetched_portfolio_element is None
 
 
-def test_get_portfolio():
+def test_get_portfolio(session: Session):
     FIRST_NAME = 'TGP1'
     SECOND_NAME = 'TGP2'
     new_user = insert_new_user(FIRST_NAME)
@@ -188,7 +138,7 @@ def test_get_portfolio():
     assert any(portfolio.name == SECOND_NAME for portfolio in fetched_portfolio)
 
 
-def test_portfolio_deletion():
+def test_portfolio_deletion(session: Session):
     NAME = 'TPD'
     new_user = insert_new_user(NAME)
     new_portfolio = insert_new_portfolio(NAME, new_user.id)
@@ -199,7 +149,7 @@ def test_portfolio_deletion():
     assert fetched_portfolio is None
 
 
-def test_consequences_of_portfolio_deletion():
+def test_consequences_of_portfolio_deletion(session: Session):
     NAME = 'TCOPD'
     new_asset_type = insert_new_asset_type(NAME)
     new_asset = insert_new_asset(NAME, new_asset_type.id)
@@ -222,7 +172,7 @@ def test_consequences_of_portfolio_deletion():
     assert fetched_asset_type is not None
 
 
-def test_asset_insertion():
+def test_asset_insertion(session: Session):
     NAME = 'TAI'
     new_asset_type = insert_new_asset_type(NAME)
 
@@ -233,7 +183,7 @@ def test_asset_insertion():
     assert fetched_asset.name == new_asset.name
 
 
-def test_get_asset_by_name():
+def test_get_asset_by_name(session: Session):
     NAME = 'TGABN'
     new_asset_type = insert_new_asset_type(NAME)
     new_asset = insert_new_asset(NAME, new_asset_type.id)
@@ -244,7 +194,7 @@ def test_get_asset_by_name():
     assert fetched_asset.name == new_asset.name
 
 
-def test_asset_deletion():
+def test_asset_deletion(session: Session):
     NAME = 'TAD'
     new_asset_type = insert_new_asset_type(NAME)
     new_asset = insert_new_asset(NAME, new_asset_type.id)
@@ -255,7 +205,7 @@ def test_asset_deletion():
         get_asset_by_name(NAME)
 
 
-def test_asset_type_insertion():
+def test_asset_type_insertion(session: Session):
     NAME = 'TATI'
     new_asset_type = add_new_asset_type(NAME, NAME)
 
@@ -268,7 +218,7 @@ def test_asset_type_insertion():
         add_new_asset_type(NAME, NAME)
 
 
-def test_get_asset_type_by_name():
+def test_get_asset_type_by_name(session: Session):
     new_asset_type = insert_new_asset_type('TGATBN')
 
     fetched_asset_type = get_asset_type_by_name(new_asset_type.name)
@@ -277,7 +227,7 @@ def test_get_asset_type_by_name():
     assert fetched_asset_type.name == new_asset_type.name
 
 
-def test_asset_type_deletion():
+def test_asset_type_deletion(session: Session):
     NAME = 'TATD'
     new_asset_type = insert_new_asset_type(NAME)
 

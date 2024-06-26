@@ -1,11 +1,14 @@
 import pytest
-from src.database.setup import engine
-from src.database.models import Base
+
+from sqlalchemy.orm.session import Session
+
 from src.portfolio_analysis.stock_analysis import *
-from tests.database_testing_functions import *
+
+from tests.database.helper_queries import *
+from tests.database.conftest import session
 
 
-def test_get_stock_portfolio_distribution():
+def test_get_stock_portfolio_distribution(session: Session):
     NAME = 'TGSPD'
     new_user = insert_new_user(NAME)
     new_portfolio = insert_new_portfolio(NAME, new_user.id)
