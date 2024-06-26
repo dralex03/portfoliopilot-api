@@ -27,10 +27,10 @@ class Model(Base):
                 if is_list:
                     json_data[key] = []
                     for item in getattr(self, key):
-                        json_data[key].append(item.toJSON())
+                        json_data[key].append(item.to_json())
                 else:
-                    if self.__mapper__.relationships[key].query_class is not None:
-                        json_data[key] = getattr(self, key).toJSON()
+                    if self.__mapper__.relationships[key].query_class is not None or self.__mapper__.relationships[key].instrument_class is not None:
+                        json_data[key] = getattr(self, key).to_json()
                     else:
                         json_data[key] = getattr(self, key)
             else:
@@ -72,7 +72,7 @@ class PortfolioElement(Model):
     asset_id = Column(UUID(as_uuid=True), ForeignKey('assets.id'))
     asset = relationship('Asset', back_populates='portfolio_elements')
 
-    _json_values = ['id', 'count', 'buy_price', 'order_fee', 'portfolio_id', 'asset_id', 'asset']
+    _json_values = ['id', 'count', 'buy_price', 'order_fee', 'portfolio_id', 'asset']
 
 
 class Asset(Model):
