@@ -13,7 +13,7 @@ session = Session()
 
 
 def setup_database():
-    if not engine.url.get_backend_name() == 'postgresql+psycopg2':
+    if not engine.url.get_backend_name() == 'postgresql':
         raise RuntimeError('Use PostgreSQL database to run production/dev!')
     try:
         #  Creates Database Tables if they do not already exist
