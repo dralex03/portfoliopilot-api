@@ -128,7 +128,7 @@ def get_portfolio_by_name(user_id: str, portfolio_name: str):
 
 
 @call_database_function
-def get_portfolio_by_user_id(user_id: str):
+def get_portfolios_by_user_id(user_id: str):
     """
     Fetches every portfolio that belongs to a specific user
         Parameters:

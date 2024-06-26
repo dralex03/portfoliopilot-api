@@ -6,6 +6,8 @@ from src.database import queries, models
 from src.utils.decorators import jwt_required, validate_portfolio_owner
 from src.utils.responses import *
 from src.utils.request_parser import parse_json_request_body
+from src.constants.errors import ApiErrors
+from src.constants.messages import ApiMessages
 
 # Create blueprint which is used in the flask app
 user_portfolios = Blueprint('portfolio', __name__)
@@ -26,9 +28,9 @@ def get_all_user_portfolios(user_id: str):
     """
 
     try:
-        portfolios: list[models.Portfolio] = queries.get_portfolio_by_user_id(user_id)
+        portfolios: list[models.Portfolio] = queries.get_portfolios_by_user_id(user_id)
     except Exception as e:
-        return generate_internal_error_response('Error fetching all portfolios.', e)
+        return generate_internal_error_response(ApiErrors.Portfolio.get_portfolios_by_user_id_error, e)
 
     return generate_success_response([p.to_json() for p in portfolios])
 
@@ -72,15 +74,15 @@ def delete_user_portfolio(user_id: str, portfolio: models.Portfolio):
     try:
         portfolio_deleted = queries.delete_portfolio_by_id(portfolio.id)
     except Exception as e:
-        return generate_internal_error_response(f'Error deleting portfolio with ID "{portfolio.id}".', e)
+        return generate_internal_error_response(ApiErrors.delete_data_by_id_error('portfolio', portfolio.id), e)
     
     # Check if portfolio was deleted successfully
     if portfolio_deleted == True:
-        return generate_success_response(f'Portfolio with ID "{portfolio.id}" deleted successfully.')
+        return generate_success_response(ApiMessages.delete_data_by_id_success('portfolio', portfolio.id))
     else:
         response_object = {
             'success': False,
-            'message': f'Portfolio with ID "{portfolio.id}" not found.'
+            'message': ApiErrors.data_by_id_not_found('portfolio', portfolio.id)
         }
         return make_response(jsonify(response_object)), status.HTTP_404_NOT_FOUND
 
@@ -105,24 +107,24 @@ def create_user_portfolio(user_id: str):
     except ValueError as e:
         return generate_bad_request_response(str(e))
     except Exception as e:
-        return generate_internal_error_response('Error Parsing JSON body.', e)
+        return generate_internal_error_response(ApiErrors.invalid_json, e)
     
     portfolio_name = request_body.get('name')
 
     # Validating field types
     if not isinstance(portfolio_name, str):
-        return generate_bad_request_response('Field "name" needs to be a string.')
+        return generate_bad_request_response(ApiErrors.field_wrong_type('name', 'string'))
 
     # Validating field values
     if not len(portfolio_name) > 0:
-        return generate_bad_request_response('Field "name" can not be empty.')
+        return generate_bad_request_response(ApiErrors.field_is_empty('name'))
 
     try:
         portfolio: models.Portfolio = queries.add_portfolio(portfolio_name, user_id)
     except IntegrityError as e:
-        return generate_bad_request_response(f'Portfolio with name "{portfolio_name}" already exists.')
+        return generate_bad_request_response(ApiErrors.Portfolio.portfolio_already_exists)
     except Exception as e:
-        return generate_internal_error_response('Error creating portfolio.', e)
+        return generate_internal_error_response(ApiErrors.Portfolio.add_portfolio_error, e)
 
     return generate_success_response(portfolio.to_json())
 
@@ -148,33 +150,33 @@ def update_user_portfolio(user_id: str, portfolio: models.Portfolio):
     except ValueError as e:
         return generate_bad_request_response(str(e))
     except Exception as e:
-        return generate_internal_error_response('Error Parsing JSON body.', e)
+        return generate_internal_error_response(ApiErrors.invalid_json, e)
     
     portfolio_name = request_body.get('name')
     
     # Validating field types
     if not isinstance(portfolio_name, str):
-        return generate_bad_request_response('Field "name" needs to be a string.')
+        return generate_bad_request_response(ApiErrors.field_wrong_type('name', 'string'))
 
     # Validating field values
     if not len(portfolio_name) > 0:
-        return generate_bad_request_response('Field "name" can not be empty.')
+        return generate_bad_request_response(ApiErrors.field_is_empty('name'))
 
     # Checking if user already owns a portfolio with this name
     try:
         existing_portfolio = queries.get_portfolio_by_name(user_id, portfolio_name)
     except Exception as e:
-        return generate_internal_error_response('Error updating portfolio.', e)
+        return generate_internal_error_response(ApiErrors.Portfolio.update_portfolio_name_error, e)
     
     if existing_portfolio is not None:
-        return generate_bad_request_response(f'Portfolio with name "{portfolio_name}" already exists. Please choose another name.')
+        return generate_bad_request_response(ApiErrors.Portfolio.portfolio_already_exists)
 
 
     # Updating Portfolio Name and sending updated portfolio in response
     try:
         portfolio: models.Portfolio = queries.update_portfolio_name(portfolio.id, portfolio_name)
     except Exception as e:
-        return generate_internal_error_response('Error updating portfolio.', e)
+        return generate_internal_error_response(ApiErrors.Portfolio.update_portfolio_name_error, e)
 
     return generate_success_response(portfolio.to_json())
 
@@ -201,7 +203,7 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
     except ValueError as e:
         return generate_bad_request_response(str(e))
     except Exception as e:
-        return generate_internal_error_response('Error Parsing JSON body.', e)
+        return generate_internal_error_response(ApiErrors.invalid_json, e)
     
     
     asset_id = request_body.get('asset_id')
@@ -211,17 +213,17 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
 
     # Validating field types
     if not isinstance(asset_id, str):
-        return generate_bad_request_response('Field "asset_id" needs to be a string.')
+        return generate_bad_request_response(ApiErrors.field_wrong_type('asset_id', 'string'))
     if not isinstance(count, float):
-        return generate_bad_request_response('Field "count" needs to be a float.')
+        return generate_bad_request_response(ApiErrors.field_wrong_type('count', 'float'))
     if not isinstance(buy_price, float):
-        return generate_bad_request_response('Field "buy_price" needs to be a float.')
+        return generate_bad_request_response(ApiErrors.field_wrong_type('buy_price', 'float'))
     if not isinstance(order_fee, float):
-        return generate_bad_request_response('Field "order_fee" needs to be a float.')
+        return generate_bad_request_response(ApiErrors.field_wrong_type('order_fee', 'float'))
     
     # Validating field values
     if count <= 0:
-        return generate_bad_request_response('Field "count" needs to be greater than 0.')
+        return generate_bad_request_response('Field "count" needs to be greater than 0.') # TODO
     if buy_price <= 0:
         return generate_bad_request_response('Field "buy_price" needs to be greater than 0.')
     if order_fee < 0:
@@ -231,7 +233,7 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
     try:
         portfolio_element: models.PortfolioElement = queries.add_portfolio_element(portfolio.id, asset_id, count, buy_price, order_fee)
     except Exception as e:
-        return generate_internal_error_response('Error adding asset to portfolio.', e)
+        return generate_internal_error_response(ApiErrors.Portfolio.add_portfolio_element_error, e)
     
     return generate_success_response(portfolio_element.to_json())
 
@@ -259,7 +261,7 @@ def get_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, p_e
     try:
         portfolio_element: models.PortfolioElement = queries.get_portfolio_element(portfolio.id, p_element_id)
     except Exception as e:
-        return generate_internal_error_response('Error fetching portfolio element.', e)
+        return generate_internal_error_response(ApiErrors.Portfolio.get_portfolio_element_error, e)
     
     return generate_success_response(portfolio_element.to_json())
 
@@ -287,15 +289,15 @@ def delete_element_from_user_portfolio(user_id: str, portfolio: models.Portfolio
     try:
         element_deleted: models.PortfolioElement = queries.delete_portfolio_element(portfolio.id, p_element_id)
     except Exception as e:
-        return generate_internal_error_response('Error deleting portfolio element.', e)
+        return generate_internal_error_response(ApiErrors.delete_data_by_id_error('portfolio element', p_element_id), e)
     
     # Check if portfolio was deleted successfully
     if element_deleted == True:
-        return generate_success_response(f'Portfolio Element with ID "{p_element_id}" deleted successfully.')
+        return generate_success_response(ApiMessages.delete_data_by_id_success('portfolio element', p_element_id))
     else:
         response_object = {
             'success': False,
-            'message': f'Portfolio Element with ID "{p_element_id}" not found.'
+            'message': ApiErrors.data_by_id_not_found('portfolio element', p_element_id)
         }
         return make_response(jsonify(response_object)), status.HTTP_404_NOT_FOUND
 
@@ -326,37 +328,41 @@ def update_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, 
     except ValueError as e:
         return generate_bad_request_response(str(e))
     except Exception as e:
-        return generate_internal_error_response('Error Parsing JSON body.', e)
+        return generate_internal_error_response(ApiErrors.invalid_json, e)
     
     
-    count = request_body.get('count')
-    buy_price = request_body.get('buy_price')
-    order_fee = request_body.get('order_fee')
+    count = request_body.get('count', None)
+    buy_price = request_body.get('buy_price', None)
+    order_fee = request_body.get('order_fee', None)
 
     # Validating field types
-    if not isinstance(count, float):
-        return generate_bad_request_response('Field "count" needs to be a float.')
-    if not isinstance(buy_price, float):
-        return generate_bad_request_response('Field "buy_price" needs to be a float.')
-    if not isinstance(order_fee, float):
-        return generate_bad_request_response('Field "order_fee" needs to be a float.')
+    if not isinstance(count, float) and count is not None:
+        return generate_bad_request_response(ApiErrors.field_wrong_type('count', 'float'))
+    if not isinstance(buy_price, float) and buy_price is not None:
+        return generate_bad_request_response(ApiErrors.field_wrong_type('buy_price', 'float'))
+    if not isinstance(order_fee, float) and order_fee is not None:
+        return generate_bad_request_response(ApiErrors.field_wrong_type('order_fee', 'float'))
+    
+    # Check for at least one value thats not None
+    if count is None and buy_price is None and order_fee is None:
+        return generate_bad_request_response(ApiErrors.Portfolio.update_p_element_all_values_none)
     
     # Validating field values
-    if count <= 0:
-        return generate_bad_request_response('Field "count" needs to be greater than 0.')
-    if buy_price <= 0:
-        return generate_bad_request_response('Field "buy_price" needs to be greater than 0.')
-    if order_fee < 0:
-        return generate_bad_request_response('Field "order_fee" needs to be 0 or greater.')
+    if not count > 0:
+        return generate_bad_request_response(ApiErrors.num_field_out_of_limit('count', '0', '>'))
+    if not buy_price > 0:
+        return generate_bad_request_response(ApiErrors.num_field_out_of_limit('buy_price', '0', '>'))
+    if not order_fee >= 0:
+        return generate_bad_request_response(ApiErrors.num_field_out_of_limit('order_fee', '0', '>='))
     
     # Trying to update the portfolio element
     try:
         portfolio_element: models.PortfolioElement = queries.update_portfolio_element(portfolio.id, p_element_id, count, buy_price, order_fee)
     except Exception as e:
-        return generate_internal_error_response('Error updating portfolio element.', e)
+        return generate_internal_error_response(ApiErrors.Portfolio.update_portfolio_element_error, e)
     
     # Check if the portfolio element was deleted because the count was 0 or less
     if portfolio_element == 'deleted':
-        return generate_success_response(f'Portfolio Element with ID "{p_element_id}" was deleted because count was zero or less.')
+        return generate_success_response(ApiMessages.Portfolio.p_element_deleted_cause_count_zero(p_element_id))
     
     return generate_success_response(portfolio_element.to_json())

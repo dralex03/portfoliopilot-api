@@ -9,6 +9,7 @@ from src.utils.jwt_auth import decode_auth_token
 from src.utils.responses import *
 from src.database import queries, models
 from src.constants import http_status_codes as status
+from src.constants.errors import ApiErrors
 
 
 def validate_function_params(func: Callable, required_params: List[str]):
@@ -70,7 +71,7 @@ def jwt_required(func: Callable):
                 else:
                     response_object = {
                         'success': False,
-                        'message': 'User does not exist.'
+                        'message': ApiErrors.JwtAuth.user_id_not_exist
                     }
             else:
                 response_object = {
@@ -80,7 +81,7 @@ def jwt_required(func: Callable):
         else:
             response_object = {
                 'success': False,
-                'message': 'Missing JWT auth-token or invalid format.'
+                'message': ApiErrors.JwtAuth.missing_jwt_token
             }
 
         return make_response(jsonify(response_object)), HTTP_401_UNAUTHORIZED
@@ -116,16 +117,17 @@ def validate_portfolio_owner(func: Callable):
         try:
             portfolio: models.Portfolio = queries.get_portfolio_by_id(portfolio_id)
         except Exception as e:
-            return generate_internal_error_response(f'Error fetching portfolio with ID "{portfolio_id}".', e)
+            return generate_internal_error_response(ApiErrors.Portfolio.get_portfolio_by_id_error, e)
         
         # Check whether the user owns this portfolio or not
         if str(portfolio.user_id) == user_id:
             return func(user_id=user_id, portfolio=portfolio, *args, **kwargs)
         else:
+            # For security reasons, return 404
             response_object = {
                 'success': False,
-                'message': f'Portfolio with ID "{portfolio_id}" does not belong to User "{user_id}"'
+                'message': ApiErrors.data_by_id_not_found('portfolio', portfolio_id)
             }
-            return make_response(jsonify(response_object)), status.HTTP_403_FORBIDDEN
+            return make_response(jsonify(response_object)), status.HTTP_404_NOT_FOUND
         
     return decorator
