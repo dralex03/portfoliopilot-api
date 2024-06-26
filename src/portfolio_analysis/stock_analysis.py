@@ -6,12 +6,12 @@ from src.market_data.stock_data import get_stock_classification
 
 def get_stock_portfolio_distribution(portfolio_id: int):
     """
-    Berechnet die Länderverteilung und Sektorverteilung eines Aktienportfolios
+    Calculates the country and sector distribution of a given portfolio. Also gives back the average P/E
     Args:
-        portfolio_id:
+        int portfolio_id
 
     Returns:
-        Tuple country_weights, sector_weights or None, None if the information is not available
+        JSON country_weights, sector_weights, average_pe if data is available
     """
     tickers = [
         ticker_symbol for (ticker_symbol,) in (
