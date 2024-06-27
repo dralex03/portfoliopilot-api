@@ -100,8 +100,12 @@ class ApiErrors:
         add_portfolio_element_error = 'Error adding asset to portfolio.'
         get_portfolio_element_error = 'Error fetching portfolio element.'
         update_portfolio_element_error = 'Error updating portfolio element.'
+        get_asset_by_ticker_error = 'Error finding asset.'
+        get_asset_type_by_quote_type_error = 'Error finding asset type.'
 
         # Input Errors
         portfolio_already_exists = 'Portfolio with this name already exists.'
         update_p_element_all_values_none = 'Please enter at least one value to change.'
+        portfolio_element_asset_invalid_type = 'The quote type for this asset is not supported.'
+        portfolio_element_asset_invalid_ticker = 'No Asset was found for this ticker.'
 

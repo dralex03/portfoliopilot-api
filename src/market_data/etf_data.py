@@ -1,6 +1,7 @@
 from yahooquery import Ticker
 
 
+# TODO: not used yet
 def get_etf_info(ticker: str):
     """
     Returns specific basic etf information from yahoo finance.

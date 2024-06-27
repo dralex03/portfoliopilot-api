@@ -221,7 +221,7 @@ def test_asset_type_insertion(session: Session):
 def test_get_asset_type_by_name(session: Session):
     new_asset_type = insert_new_asset_type('TGATBN')
 
-    fetched_asset_type = get_asset_type_by_name(new_asset_type.name)
+    fetched_asset_type = get_asset_type_by_quote_type(new_asset_type.quote_type)
 
     assert fetched_asset_type is not None
     assert fetched_asset_type.name == new_asset_type.name

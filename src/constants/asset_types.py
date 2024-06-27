@@ -25,3 +25,7 @@ ASSET_TYPES = [
         'unitType': 'Option'
     }
 ]
+
+QUOTE_TYPE_LIST = [
+    t.get('quoteType') for t in ASSET_TYPES
+]

@@ -8,6 +8,8 @@ from src.utils.responses import *
 from src.utils.request_parser import parse_json_request_body
 from src.constants.errors import ApiErrors
 from src.constants.messages import ApiMessages
+from src.market_data.general_data import get_general_info
+from src.constants.asset_types import QUOTE_TYPE_LIST
 
 # Create blueprint which is used in the flask app
 user_portfolios = Blueprint('portfolio', __name__)
@@ -206,7 +208,7 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
         return generate_internal_error_response(ApiErrors.invalid_json, e)
     
     
-    asset_id = request_body.get('asset_id')
+    asset_ticker = request_body.get('asset_ticker')
     count = request_body.get('count')
     buy_price = request_body.get('buy_price')
     order_fee = request_body.get('order_fee')
@@ -220,8 +222,8 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
         order_fee = float(order_fee)
 
     # Validating field types
-    if not isinstance(asset_id, str):
-        return generate_bad_request_response(ApiErrors.field_wrong_type('asset_id', 'string'))
+    if not isinstance(asset_ticker, str):
+        return generate_bad_request_response(ApiErrors.field_wrong_type('asset_ticker', 'string'))
     if not isinstance(count, float):
         return generate_bad_request_response(ApiErrors.field_wrong_type('count', 'float'))
     if not isinstance(buy_price, float):
@@ -230,18 +232,70 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
         return generate_bad_request_response(ApiErrors.field_wrong_type('order_fee', 'float'))
     
     # Validating field values
-    if count <= 0:
-        return generate_bad_request_response('Field "count" needs to be greater than 0.') # TODO
-    if buy_price <= 0:
-        return generate_bad_request_response('Field "buy_price" needs to be greater than 0.')
-    if order_fee < 0:
-        return generate_bad_request_response('Field "order_fee" needs to be 0 or greater.')
+    if not count > 0:
+        return generate_bad_request_response(ApiErrors.num_field_out_of_limit('count', '0', '>'))
+    if not buy_price > 0:
+        return generate_bad_request_response(ApiErrors.num_field_out_of_limit('buy_price', '0', '>'))
+    if not order_fee >= 0:
+        return generate_bad_request_response(ApiErrors.num_field_out_of_limit('order_fee', '0', '>='))
+    
+    # Check if the asset already exists
+    try:
+        asset: models.Asset = queries.get_asset_by_ticker(asset_ticker)
+    except Exception as e:
+        return generate_internal_error_response(ApiErrors.Portfolio.get_asset_by_ticker_error, e)
+
+
+    # Add asset if its not in database yet
+    if asset is None:
+        asset_info = get_general_info(asset_ticker)
+
+        # Check if asset with this ticker exists
+        if asset_info is None:
+            return generate_bad_request_response(
+                ApiErrors.Portfolio.portfolio_element_asset_invalid_ticker
+            )
+
+        asset_quote_type = asset_info.get('quoteType')
+
+        # Make sure the asset type is supported
+        if not asset_quote_type in QUOTE_TYPE_LIST:
+            return generate_bad_request_response(
+                ApiErrors.Portfolio.portfolio_element_asset_invalid_type
+            )
+        
+        # Find correct asset type id
+        try:
+            asset_type: models.AssetType = queries.get_asset_type_by_quote_type(asset_quote_type)
+        except Exception as e:
+            return generate_internal_error_response(
+                ApiErrors.Portfolio.add_portfolio_element_error, e
+            )
+        
+        # Add new asset to database
+        try:
+            asset = queries.add_new_asset(
+                asset_info.get('shortName', asset_ticker),
+                asset_ticker,
+                asset_info.get('isin'),
+                asset_info.get('currency'),
+                asset_type.id
+            )
+        except Exception as e:
+            return generate_internal_error_response(
+                ApiErrors.Portfolio.add_portfolio_element_error, e
+            )
+
 
     # Trying to add the element to the portfolio
     try:
-        portfolio_element: models.PortfolioElement = queries.add_portfolio_element(portfolio.id, asset_id, count, buy_price, order_fee)
+        portfolio_element: models.PortfolioElement = queries.add_portfolio_element(
+            portfolio.id, asset.id, count, buy_price, order_fee
+        )
     except Exception as e:
-        return generate_internal_error_response(ApiErrors.Portfolio.add_portfolio_element_error, e)
+        return generate_internal_error_response(
+            ApiErrors.Portfolio.add_portfolio_element_error, e
+        )
     
     return generate_success_response(portfolio_element.to_json())
 

@@ -301,8 +301,12 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
             Asset
     """
     if session.query(AssetType).filter_by(id=asset_type_id).first():
-        new_asset = Asset(name=name, ticker_symbol=ticker_symbol, isin=isin, default_currency=default_currency,
-                          asset_type_id=asset_type_id)
+        new_asset = Asset(name=name,
+                          ticker_symbol=ticker_symbol,
+                          isin=isin,
+                          default_currency=default_currency,
+                          asset_type_id=asset_type_id
+                          )
         session.add(new_asset)
         return new_asset
     else:
@@ -331,7 +335,7 @@ def get_asset_by_ticker(ticker: str):
         Returns:
             Asset
     """
-    return session.query(Asset).filter_by(ticker=ticker).first()
+    return session.query(Asset).filter_by(ticker_symbol=ticker).first()
 
 
 # TODO: not used yet
@@ -369,17 +373,16 @@ def add_new_asset_type(name: str, quote_type: str, unit_type: str):
     return new_asset_type
 
 
-# TODO: not used yet
 @call_database_function
-def get_asset_type_by_name(name: str):
+def get_asset_type_by_quote_type(quote_type: str):
     """
-    Fetches an asset_type by name the database
+    Fetches an asset_type by quote_type from the database
         Parameters:
-            str name;
+            str quote_type;
         Returns:
            AssetType
     """
-    return session.query(AssetType).filter_by(name=name).first()
+    return session.query(AssetType).filter_by(quote_type=quote_type).one()
 
 
 # TODO: not used yet

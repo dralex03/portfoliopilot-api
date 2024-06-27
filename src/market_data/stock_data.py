@@ -1,6 +1,7 @@
 import yfinance as yf
 
 
+# TODO: not used yet
 def get_stock_info(ticker: str):
     """
     Returns specific stock information from yahoo finance.
@@ -20,6 +21,7 @@ def get_stock_info(ticker: str):
     return info
 
 
+# TODO: not used yet
 def get_stock_classification(ticker: str):
     """
     Returns the country, sector and pe of a given stock ticker or None if this information is not available.
