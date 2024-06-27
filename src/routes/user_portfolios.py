@@ -384,7 +384,6 @@ def update_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, 
     """
 
     # Parsing the request body
-    # TODO: default values to None
     try:
         request_body = parse_json_request_body(request)
     except ValueError as e:
