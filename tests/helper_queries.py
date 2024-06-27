@@ -12,6 +12,27 @@ def generate_random_string(n=10):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
 
 
+def generate_random_password():
+    # Ensures that there is at least one character of every group in the password
+    lower = string.ascii_lowercase
+    upper = string.ascii_uppercase
+    digits = string.digits
+    special = '!@#$%^&*(),.?":{}|<>+-'
+
+    password = [
+        random.choice(lower),
+        random.choice(upper),
+        random.choice(digits),
+        random.choice(special)
+    ]
+
+    # Ensures that the password is longer than 8 characters
+    all_characters = lower + upper + digits + special
+    password += random.choices(all_characters, k=10)
+
+    return ''.join(password)
+
+
 def generate_random_float():
     return round(random.uniform(0, 100), 2)
 
@@ -32,9 +53,9 @@ def generate_new_asset(asset_type_id):
 
 
 def generate_new_user():
-    USER_NAME = generate_random_string()
+    PASSWORD = generate_random_password()
     EMAIL = generate_random_email()
-    return insert_new_user(EMAIL, USER_NAME)
+    return insert_new_user(EMAIL, PASSWORD)
 
 
 def generate_new_portfolio(user_id):
@@ -49,8 +70,8 @@ def generate_new_portfolio_element(portfolio_id: str, asset_id: str):
     return add_portfolio_element(portfolio_id, asset_id, COUNT, BUY_PRICE, ORDER_FEE)
 
 
-def insert_new_user(email: str, name: str):
-    new_user = User(email=email, password=name)
+def insert_new_user(email: str, password: str):
+    new_user = User(email=email, password=password)
     session.add(new_user)
     session.commit()
     return new_user
