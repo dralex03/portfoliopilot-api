@@ -5,6 +5,8 @@ from flask.testing import FlaskClient
 from src.constants.errors import ApiErrors
 from src.constants.messages import ApiMessages
 
+from tests.api.routes.helper_requests import login_user
+
 
 def get_test_users_register():
     """
@@ -143,27 +145,27 @@ def test_user_login(test_client: FlaskClient, email: str, password: str, valid: 
 
 # TODO: Issue with UUIDs as sqlite doesnt understand postgresql UUIDs
 
-# def get_test_users_refresh_session():
-#     return [
-#         # Valid Test Cases
-#         ('john.doe@example.com', 'Password123!'),
-#         ('jane.smith@example.com', 'Abcdef1!')
-#     ]
+def get_test_users_refresh_session():
+    return [
+        # Valid Test Cases
+        ('john.doe@example.com', 'Password123!'),
+        ('jane.smith@example.com', 'Abcdef1!')
+    ]
 
-# @pytest.mark.parametrize("email,password", get_test_users_refresh_session())
-# def test_user_login(test_client: FlaskClient, email: str, password: str):
-#     auth_token = login_user(test_client, email, password)
-#     assert auth_token is not None
+@pytest.mark.parametrize("email,password", get_test_users_refresh_session())
+def test_user_login(test_client: FlaskClient, email: str, password: str):
+    auth_token = login_user(test_client, email, password)
+    assert auth_token is not None
 
-#     response = test_client.get('/user/refresh',
-#                                 headers={
-#                                     "Authorization": "Bearer " + auth_token
-#                                 })
+    response = test_client.get('/user/refresh',
+                                headers={
+                                    "Authorization": "Bearer " + auth_token
+                                })
     
-#     assert response.status_code == 200
-#     assert response.is_json
+    assert response.status_code == 200
+    assert response.is_json
 
-#     assert response.json['success']
+    assert response.json['success']
 
-#     assert response.json['response']['message'] == ApiMessages.User.session_refresh_success
-#     assert response.json['response']['auth_token'] is not None
+    assert response.json['response']['message'] == ApiMessages.User.session_refresh_success
+    assert response.json['response']['auth_token'] is not None

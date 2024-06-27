@@ -2,7 +2,9 @@ import uuid
 
 from sqlalchemy import Column, String, Float, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, declarative_base
-from sqlalchemy.dialects.postgresql import UUID
+
+from src.database.uuid_type import UUID
+
 
 Base = declarative_base()
 
@@ -54,7 +56,7 @@ class Model(Base):
 
 class User(Model):
     __tablename__ = 'users'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     portfolios = relationship('Portfolio', back_populates='owner')
@@ -64,9 +66,9 @@ class User(Model):
 
 class Portfolio(Model):
     __tablename__ = 'portfolios'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'))
+    user_id = Column(UUID(), ForeignKey('users.id'))
     owner = relationship('User', back_populates='portfolios')
     elements = relationship('PortfolioElement', back_populates='portfolio', cascade='all, delete-orphan')
     __table_args__ = (UniqueConstraint('name', 'user_id', name='portfolio_name_id_uc'),)
@@ -76,13 +78,13 @@ class Portfolio(Model):
 
 class PortfolioElement(Model):
     __tablename__ = 'portfolio_elements'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     count = Column(Float, nullable=False)
     buy_price = Column(Float, nullable=False)
     order_fee = Column(Float, nullable=True)
-    portfolio_id = Column(UUID(as_uuid=True), ForeignKey('portfolios.id'))
+    portfolio_id = Column(UUID(), ForeignKey('portfolios.id'))
     portfolio = relationship('Portfolio', back_populates='elements')
-    asset_id = Column(UUID(as_uuid=True), ForeignKey('assets.id'))
+    asset_id = Column(UUID(), ForeignKey('assets.id'))
     asset = relationship('Asset', back_populates='portfolio_elements')
 
     _json_values = ['id', 'count', 'buy_price', 'order_fee', 'portfolio_id', 'asset']
@@ -90,12 +92,12 @@ class PortfolioElement(Model):
 
 class Asset(Model):
     __tablename__ = 'assets'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     ticker_symbol = Column(String, unique=True, nullable=False)
     isin = Column(String, unique=True, nullable=True)
     default_currency = Column(String, nullable=True)
-    asset_type_id = Column(UUID(as_uuid=True), ForeignKey('asset_types.id'))
+    asset_type_id = Column(UUID(), ForeignKey('asset_types.id'))
     asset_type = relationship('AssetType', back_populates='assets')
     portfolio_elements = relationship('PortfolioElement', back_populates='asset')
 
@@ -104,7 +106,7 @@ class Asset(Model):
 
 class AssetType(Model):
     __tablename__ = 'asset_types'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String, unique=True, nullable=False)
     quote_type = Column(String, unique=True, nullable=False)
     unit_type = Column(String, nullable=False)
