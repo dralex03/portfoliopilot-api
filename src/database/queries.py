@@ -286,7 +286,6 @@ def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float 
     return portfolio_element
 
 
-# TODO: not used yet
 @call_database_function
 def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: str, asset_type_id: str):
     """
