@@ -8,6 +8,14 @@ from tests.api.routes.helper_requests import login_user
 
 
 def get_all_post_urls_with_json():
+    """
+    Helper function that returns a list of test data.
+        Parameters:
+            -
+        Returns:
+            List[Tuple]: A list of all URL paths that use POST or PUT
+                to test invalid JSON bodies.
+    """
     return [
         ('POST', '/user/login'),
         ('POST', '/user/register')
@@ -19,6 +27,17 @@ def get_all_post_urls_with_json():
 
 @pytest.mark.parametrize("method, path", get_all_post_urls_with_json())
 def test_json_parsing(test_client: FlaskClient, method: str, path: str):
+    """
+    Parametrized test to test all POST and PUT endpoints for correct behavior
+    on invalid JSON bodies.
+        Parameters:
+            FlaskClient test_client;
+            str method;
+            str path;
+        Returns:
+            -
+    """
+    
     # Test invalid JSON body
     if method == 'POST':
         response = test_client.post(path, data='abc', content_type='application/json')
