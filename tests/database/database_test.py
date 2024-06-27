@@ -14,6 +14,7 @@ def test_user_insertion(session: Session):
     add_new_user(USER_EMAIL, PASSWORD)
 
     fetched_user = session.query(User).filter_by(email=USER_EMAIL).first()
+
     assert fetched_user is not None
     assert fetched_user.email == USER_EMAIL
 
@@ -36,6 +37,18 @@ def test_get_user_by_email(session: Session):
     user = get_user_by_email(new_user.email)
     assert user is not None
     assert user.email == new_user.email
+
+    user = get_user_by_email('d!3d?4#cDcBAD3')
+    assert user is None
+
+
+def test_get_user_by_id(session: Session):
+    new_user = insert_new_user('TGUBE')
+
+    user = get_user_by_id(new_user.id)
+
+    assert user is not None
+    assert user.id == new_user.id
 
 
 def test_portfolio_insertion(session: Session):
@@ -86,6 +99,20 @@ def test_portfolio_element_update(session: Session):
     assert fetched_portfolio_element.count == 5.0
 
 
+def test_get_portfolio_element(session: Session):
+    FIRST_NAME = 'TGPE'
+    new_asset_type = insert_new_asset_type(FIRST_NAME)
+    new_asset_1 = insert_new_asset(FIRST_NAME, new_asset_type.id)
+    new_user = insert_new_user(FIRST_NAME)
+    new_portfolio = insert_new_portfolio(FIRST_NAME, new_user.id)
+    new_portfolio_element = insert_new_portfolio_element(10.0, new_portfolio.id, new_asset_1.id)
+
+    fetched_portfolio_element = get_portfolio_element(new_portfolio.id, new_portfolio_element.id)
+
+    assert fetched_portfolio_element is not None
+    assert fetched_portfolio_element.order_fee == 10.0
+
+
 def test_get_portfolio_all_elements(session: Session):
     FIRST_NAME = 'TGP1'
     SECOND_NAME = 'TGP2'
@@ -124,18 +151,49 @@ def test_portfolio_element_deletion(session: Session):
     assert fetched_portfolio_element is None
 
 
-def test_get_portfolio(session: Session):
+def test_get_portfolio_by_user_id(session: Session):
     FIRST_NAME = 'TGP1'
     SECOND_NAME = 'TGP2'
     new_user = insert_new_user(FIRST_NAME)
-    insert_new_portfolio(FIRST_NAME, new_user.id)
-    insert_new_portfolio(SECOND_NAME, new_user.id)
+    portfolio1 = insert_new_portfolio(FIRST_NAME, new_user.id)
+    portfolio2 = insert_new_portfolio(SECOND_NAME, new_user.id)
 
-    fetched_portfolio = get_portfolios_by_user_id(new_user.id)
-    assert fetched_portfolio is not None
-    assert len(fetched_portfolio) == 2
-    assert any(portfolio.name == FIRST_NAME for portfolio in fetched_portfolio)
-    assert any(portfolio.name == SECOND_NAME for portfolio in fetched_portfolio)
+    fetched_portfolio_user_id = get_portfolios_by_user_id(new_user.id)
+    assert fetched_portfolio_user_id is not None
+    assert len(fetched_portfolio_user_id) == 2
+    assert any(portfolio.name == FIRST_NAME for portfolio in fetched_portfolio_user_id)
+    assert any(portfolio.name == SECOND_NAME for portfolio in fetched_portfolio_user_id)
+
+
+def test_get_portfolio_by_id(session: Session):
+    NAME = 'TGPBI'
+    new_user = insert_new_user(NAME)
+    portfolio = insert_new_portfolio(NAME, new_user.id)
+
+    fetched_portfolio_by_id = get_portfolio_by_id(portfolio.id)
+    assert fetched_portfolio_by_id is not None
+    assert fetched_portfolio_by_id.name == NAME
+
+
+def test_get_portfolio_by_name(session: Session):
+    NAME = 'TGPBN'
+    new_user = insert_new_user(NAME)
+    portfolio = insert_new_portfolio(NAME, new_user.id)
+
+    fetched_portfolio_by_name = get_portfolio_by_name(new_user.id, portfolio.name)
+    assert fetched_portfolio_by_name is not None
+    assert fetched_portfolio_by_name.name == NAME
+
+
+def test_update_portfolio_name(session: Session):
+    NAME = 'TUPN'
+    NEW_NAME = 'new name'
+    new_user = insert_new_user(NAME)
+    portfolio = insert_new_portfolio(NAME, new_user.id)
+
+    updated_portfolio = update_portfolio_name(portfolio.id, NEW_NAME)
+    assert updated_portfolio is not None
+    assert updated_portfolio.name == NEW_NAME
 
 
 def test_portfolio_deletion(session: Session):
