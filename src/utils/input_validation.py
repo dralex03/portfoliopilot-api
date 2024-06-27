@@ -1,11 +1,11 @@
 import re
 from src import config
 
-def is_valid_email(email):
+def is_valid_email(email: str):
     """
     Checks a string if it's a valid email address.
         Parameters:
-            email: str
+            str email;
         Returns:
             bool: Whether the email parameter is a valid email or not.
     """
@@ -16,7 +16,8 @@ def is_valid_email(email):
     )
     return re.match(email_regex, email) is not None
 
-def is_strong_password(password):
+
+def is_strong_password(password: str):
     """
     Checks if a password fulfills the password requirements:
     - minimum length 8 characters
@@ -25,7 +26,7 @@ def is_strong_password(password):
     - at least one special character
 
         Parameters:
-            password: str
+            str password;
         Returns:
             bool: If the password meets the requirements
     """
