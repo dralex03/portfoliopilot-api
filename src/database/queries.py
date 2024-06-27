@@ -108,13 +108,13 @@ def add_portfolio(name: str, user_id: str):
 @call_database_function
 def get_portfolio_by_id(portfolio_id: str):
     """
-    Fetches every portfolio that belongs to a specific user
+    Fetches a portfolio by its ID.
         Parameters:
             str portfolio_id;
         Returns:
             Portfolio
     """
-    return session.query(Portfolio).filter(Portfolio.id == portfolio_id).one()
+    return session.query(Portfolio).filter_by(id=portfolio_id).one()
 
 
 @call_database_function
@@ -126,7 +126,7 @@ def get_portfolio_by_name(user_id: str, portfolio_name: str):
         Returns:
             Portfolio
     """
-    return session.query(Portfolio).filter(Portfolio.user_id == user_id, Portfolio.name == portfolio_name).first()
+    return session.query(Portfolio).filter_by(user_id=user_id, name=portfolio_name).first()
 
 
 @call_database_function
@@ -161,7 +161,7 @@ def delete_portfolio_by_id(portfolio_id: str):
 @call_database_function
 def update_portfolio_name(portfolio_id: str, new_portfolio_name: str):
     """
-    Fetches a portfolio by name for a specific user id
+    Updates the name of a specific portfolio.
         Parameters:
             str portfolio_id;
             str new_portfolio_name;
@@ -169,7 +169,7 @@ def update_portfolio_name(portfolio_id: str, new_portfolio_name: str):
             Portfolio
     """
 
-    existing_portfolio = session.query(Portfolio).filter(Portfolio.id == portfolio_id).first()
+    existing_portfolio = session.query(Portfolio).filter_by(id=portfolio_id).first()
     existing_portfolio.name = new_portfolio_name
 
     return existing_portfolio
@@ -217,7 +217,7 @@ def get_portfolio_element(portfolio_id: str, p_element_id: str):
         Returns:
             PortfolioElement
     """
-    return session.query(PortfolioElement).filter(PortfolioElement.portfolio_id == portfolio_id, PortfolioElement.id == p_element_id).one()
+    return session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id, id=p_element_id).one()
 
 
 # TODO: not used yet
@@ -243,7 +243,7 @@ def delete_portfolio_element(portfolio_id: str, p_element_id: str):
         Returns:
             Boolean True if the portfolio element was successfully deleted, False otherwise
     """
-    portfolio_element = session.query(PortfolioElement).filter(PortfolioElement.id == p_element_id, PortfolioElement.portfolio_id == portfolio_id).first()
+    portfolio_element = session.query(PortfolioElement).filter_by(id=p_element_id, portfolio_id=portfolio_id).first()
     if portfolio_element:
         session.delete(portfolio_element)
         return True
