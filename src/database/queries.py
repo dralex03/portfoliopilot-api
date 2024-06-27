@@ -114,7 +114,7 @@ def get_portfolio_by_id(portfolio_id: str):
         Returns:
             Portfolio
     """
-    return session.query(Portfolio).filter_by(id=portfolio_id).one()
+    return session.query(Portfolio).filter_by(id=portfolio_id).first()
 
 
 @call_database_function

@@ -94,7 +94,7 @@ class ApiErrors:
 
         # Query Errors
         get_portfolios_by_user_id_error = 'Error fetching all portfolios.'
-        get_portfolio_by_id_error = 'Error fetching portfolio.'
+        get_portfolio_by_id_error = 'Error deleting portfolio.'
         add_portfolio_error = 'Error creating portfolio.'
         update_portfolio_name_error = 'Error updating portfolio.'
         add_portfolio_element_error = 'Error adding asset to portfolio.'

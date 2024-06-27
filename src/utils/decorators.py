@@ -128,7 +128,7 @@ def validate_portfolio_owner(func: Callable):
             return generate_internal_error_response(ApiErrors.Portfolio.get_portfolio_by_id_error, e)
         
         # Check whether the user owns this portfolio or not
-        if str(portfolio.user_id) == user_id:
+        if portfolio is not None and str(portfolio.user_id) == user_id:
             return func(user_id=user_id, portfolio=portfolio, *args, **kwargs)
         else:
             # For security reasons, return 404
