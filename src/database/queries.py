@@ -313,13 +313,25 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
 @call_database_function
 def get_asset_by_name(name: str):
     """
-    Fetches an asset by name the database
+    Fetches an asset by name from the database
         Parameters:
             str name;
         Returns:
             Asset
     """
     return session.query(Asset).filter_by(name=name).one()
+
+
+@call_database_function
+def get_asset_by_ticker(ticker: str):
+    """
+    Fetches an asset by ticker from the database
+        Parameters:
+            str ticker;
+        Returns:
+            Asset
+    """
+    return session.query(Asset).filter_by(ticker=ticker).first()
 
 
 # TODO: not used yet
@@ -342,16 +354,17 @@ def delete_asset(asset_id: str):
 
 # TODO: not used yet
 @call_database_function
-def add_new_asset_type(name: str, unit_type: str):
+def add_new_asset_type(name: str, quote_type: str, unit_type: str):
     """
     Creates an asset_type based on the transferred values
         Parameters:
             str name;
+            str quote_type;
             str unit_type;
         Returns:
             AssetType
     """
-    new_asset_type = AssetType(name=name, unit_type=unit_type)
+    new_asset_type = AssetType(name=name, quote_type=quote_type, unit_type=unit_type)
     session.add(new_asset_type)
     return new_asset_type
 
@@ -366,7 +379,7 @@ def get_asset_type_by_name(name: str):
         Returns:
            AssetType
     """
-    return session.query(AssetType).filter_by(name=name).one()
+    return session.query(AssetType).filter_by(name=name).first()
 
 
 # TODO: not used yet

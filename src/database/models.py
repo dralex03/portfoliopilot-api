@@ -106,7 +106,8 @@ class AssetType(Model):
     __tablename__ = 'asset_types'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, unique=True, nullable=False)
+    quote_type = Column(String, unique=True, nullable=False)
     unit_type = Column(String, nullable=False)
     assets = relationship('Asset', back_populates='asset_type')
 
-    _json_values = ['id', 'name', 'unit_type']
+    _json_values = ['id', 'name', 'quote_type', 'unit_type']
