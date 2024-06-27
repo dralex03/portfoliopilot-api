@@ -9,6 +9,13 @@ from src.database.models import Base
 
 @pytest.fixture(scope='module')
 def setup_session():
+    """
+    Pytest Fixture that sets up a database session for API Tests.
+        Parameters:
+            -
+        Returns:
+            -
+    """
     # Check for SQLite for test environment
     if not engine.url.get_backend_name() == 'sqlite':
         raise RuntimeError('Use SQLite Database to run tests')
@@ -25,6 +32,13 @@ def setup_session():
 
 @pytest.fixture(scope='module')
 def test_client(setup_session):
+    """
+    Pytest fixture that sets up a flask app and a test client for testing API requests.
+        Parameters:
+            Session setup_session;
+        Returns:
+            -
+    """
     flask_app: FlaskClient = create_app()
     flask_app.config.update({
         'TESTING': True,

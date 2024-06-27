@@ -3,6 +3,7 @@ from typing import Callable, List
 import inspect
 
 from flask import request, make_response, jsonify
+from sqlalchemy.exc import NoResultFound
 
 from src.constants.http_status_codes import HTTP_401_UNAUTHORIZED
 from src.utils.jwt_auth import decode_auth_token
@@ -62,11 +63,18 @@ def jwt_required(func: Callable):
             is_valid, uid_or_message = decode_auth_token(auth_token)
             
             if is_valid:
+                user = None
+
                 # If the token is valid, make sure the user exists
-                user = queries.get_user_by_id(uid_or_message)
+                try:
+                    user = queries.get_user_by_id(uid_or_message)
+                except NoResultFound as e: # User ID was not found
+                    pass
+                except Exception as e:
+                    return generate_internal_error_response(ApiErrors.User.get_user_by_id_error, e)
 
                 # If user exists, continue with wrapped function
-                if user:
+                if user is not None:
                     return func(user_id=uid_or_message, *args, **kwargs)
                 else:
                     response_object = {

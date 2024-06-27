@@ -65,6 +65,7 @@ class ApiErrors:
 
         # Query Errors
         get_user_by_email_error = 'Error finding user.'
+        get_user_by_id_error = 'Error finding user.'
         add_new_user_error = 'Error creating user.'
 
         # Register
@@ -76,6 +77,10 @@ class ApiErrors:
         login_invalid_credentials = 'Invalid email or password.'
 
     class JwtAuth:
+        """
+        This class contains all error messages for jwt authentication
+        """
+
         user_id_not_exist = 'User ID does not exist.'
         missing_jwt_token = 'Missing JWT auth-token or invalid format.'
         jwt_token_expired = 'Signature expired. Please log in again.'

@@ -3,13 +3,11 @@ from yahooquery import Ticker
 
 def get_etf_info(ticker: str):
     """
-        Returns specific basic etf information from yahoo finance
-
-        Args:
-            str ticker
-
+    Returns specific basic etf information from yahoo finance.
+        Parameters:
+            str ticker;
         Returns:
-            JSON etf_data
+            dict: Information about the ETF.
         """
     info = Ticker(ticker)
 

@@ -4,11 +4,16 @@ from flask.testing import FlaskClient
 
 from src.constants.errors import ApiErrors
 from src.constants.messages import ApiMessages
-from tests.api.conftest import test_client
-from tests.api.routes.helper_requests import login_user
 
 
 def get_test_users_register():
+    """
+    Helper function that returns a list of test data.
+        Parameters:
+            -
+        Returns:
+            List[Tuple]: A list of test data for testing user registration request.
+    """
     return [
         # Valid Test Cases
         ('john.doe@example.com', 'Password123!', True, 200, ApiMessages.User.register_success),
@@ -37,6 +42,18 @@ def get_test_users_register():
 
 @pytest.mark.parametrize("email,password,valid,status_code,message", get_test_users_register())
 def test_user_registration(test_client: FlaskClient, email: str, password: str, valid: bool, status_code: int, message: str):
+    """
+    Parametrized test to the user registration endpoint for correct behavior.
+        Parameters:
+            FlaskClient test_client;
+            str email;
+            str password;
+            bool valid;
+            int status_code;
+            str password;
+        Returns:
+            -
+    """
     response = test_client.post('/user/register',
                                 json={
                                     'email': email,
@@ -62,6 +79,13 @@ def test_user_registration(test_client: FlaskClient, email: str, password: str, 
 
 
 def get_test_users_login():
+    """
+    Helper function that returns a list of test data.
+        Parameters:
+            -
+        Returns:
+            List[Tuple]: A list of test data for testing user login request.
+    """
     return [
         # Valid Test Cases
         ('john.doe@example.com', 'Password123!', True, 200, ApiMessages.User.login_success),
@@ -80,6 +104,19 @@ def get_test_users_login():
 
 @pytest.mark.parametrize("email,password,valid,status_code,message", get_test_users_login())
 def test_user_login(test_client: FlaskClient, email: str, password: str, valid: bool, status_code: int, message: str):
+    """
+    Parametrized test to the user login endpoint for correct behavior.
+        Parameters:
+            FlaskClient test_client;
+            str email;
+            str password;
+            bool valid;
+            int status_code;
+            str password;
+        Returns:
+            -
+    """
+
     response = test_client.post('/user/login',
                                 json={
                                     'email': email,

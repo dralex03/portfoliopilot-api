@@ -6,13 +6,13 @@ from typing import Callable
 
 def call_database_function(function: Callable):
     """
-        Handles Errors for every query, in order to improve code quality by avoiding redundant try and except blocks
-        Furthermore a commit after every transaction is ensured so inconsistencies are avoided
-        In addition on error the database session gets rolled backed and in every case closed
-    Args:
-        Callable function
-    Returns:
-        The result of the passed function or the error with the name of the failed function
+    Handles Errors for every query, in order to improve code quality by avoiding redundant try and except blocks
+    Furthermore a commit after every transaction is ensured so inconsistencies are avoided
+    In addition on error the database session gets rolled backed and in every case closed
+        Parameters:
+            Callable function;
+        Returns:
+            Any: The result of the passed function or the error with the name of the failed function;
     """
 
     @wraps(function)
@@ -108,13 +108,13 @@ def add_portfolio(name: str, user_id: str):
 @call_database_function
 def get_portfolio_by_id(portfolio_id: str):
     """
-    Fetches every portfolio that belongs to a specific user
+    Fetches a portfolio by its ID.
         Parameters:
             str portfolio_id;
         Returns:
             Portfolio
     """
-    return session.query(Portfolio).filter(Portfolio.id == portfolio_id).one()
+    return session.query(Portfolio).filter_by(id=portfolio_id).one()
 
 
 @call_database_function
@@ -126,7 +126,7 @@ def get_portfolio_by_name(user_id: str, portfolio_name: str):
         Returns:
             Portfolio
     """
-    return session.query(Portfolio).filter(Portfolio.user_id == user_id, Portfolio.name == portfolio_name).first()
+    return session.query(Portfolio).filter_by(user_id=user_id, name=portfolio_name).first()
 
 
 @call_database_function
@@ -161,7 +161,7 @@ def delete_portfolio_by_id(portfolio_id: str):
 @call_database_function
 def update_portfolio_name(portfolio_id: str, new_portfolio_name: str):
     """
-    Fetches a portfolio by name for a specific user id
+    Updates the name of a specific portfolio.
         Parameters:
             str portfolio_id;
             str new_portfolio_name;
@@ -169,7 +169,7 @@ def update_portfolio_name(portfolio_id: str, new_portfolio_name: str):
             Portfolio
     """
 
-    existing_portfolio = session.query(Portfolio).filter(Portfolio.id == portfolio_id).first()
+    existing_portfolio = session.query(Portfolio).filter_by(id=portfolio_id).first()
     existing_portfolio.name = new_portfolio_name
 
     return existing_portfolio
@@ -217,7 +217,7 @@ def get_portfolio_element(portfolio_id: str, p_element_id: str):
         Returns:
             PortfolioElement
     """
-    return session.query(PortfolioElement).filter(PortfolioElement.portfolio_id == portfolio_id, PortfolioElement.id == p_element_id).one()
+    return session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id, id=p_element_id).one()
 
 
 # TODO: not used yet
@@ -243,7 +243,7 @@ def delete_portfolio_element(portfolio_id: str, p_element_id: str):
         Returns:
             Boolean True if the portfolio element was successfully deleted, False otherwise
     """
-    portfolio_element = session.query(PortfolioElement).filter(PortfolioElement.id == p_element_id, PortfolioElement.portfolio_id == portfolio_id).first()
+    portfolio_element = session.query(PortfolioElement).filter_by(id=p_element_id, portfolio_id=portfolio_id).first()
     if portfolio_element:
         session.delete(portfolio_element)
         return True
@@ -313,13 +313,25 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
 @call_database_function
 def get_asset_by_name(name: str):
     """
-    Fetches an asset by name the database
+    Fetches an asset by name from the database
         Parameters:
             str name;
         Returns:
             Asset
     """
     return session.query(Asset).filter_by(name=name).one()
+
+
+@call_database_function
+def get_asset_by_ticker(ticker: str):
+    """
+    Fetches an asset by ticker from the database
+        Parameters:
+            str ticker;
+        Returns:
+            Asset
+    """
+    return session.query(Asset).filter_by(ticker=ticker).first()
 
 
 # TODO: not used yet
@@ -342,16 +354,17 @@ def delete_asset(asset_id: str):
 
 # TODO: not used yet
 @call_database_function
-def add_new_asset_type(name: str, unit_type: str):
+def add_new_asset_type(name: str, quote_type: str, unit_type: str):
     """
     Creates an asset_type based on the transferred values
         Parameters:
             str name;
+            str quote_type;
             str unit_type;
         Returns:
             AssetType
     """
-    new_asset_type = AssetType(name=name, unit_type=unit_type)
+    new_asset_type = AssetType(name=name, quote_type=quote_type, unit_type=unit_type)
     session.add(new_asset_type)
     return new_asset_type
 
@@ -366,7 +379,7 @@ def get_asset_type_by_name(name: str):
         Returns:
            AssetType
     """
-    return session.query(AssetType).filter_by(name=name).one()
+    return session.query(AssetType).filter_by(name=name).first()
 
 
 # TODO: not used yet

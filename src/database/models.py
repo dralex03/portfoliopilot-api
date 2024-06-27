@@ -7,12 +7,25 @@ from sqlalchemy.dialects.postgresql import UUID
 Base = declarative_base()
 
 class Model(Base):
+    """
+    Abstract class to implement a functionality that the objects can be
+    represented as a dictionary and can be parsed to JSON.
+    """
+
     __abstract__ = True
 
-    # Store values that shall be revealed in the json
+    # Store values that shall be revealed in the json representation
     _json_values = []
 
     def to_json(self):
+        """
+        Custom function to return the object as a dictionary without any
+        complex objects so that the dict can be parsed as JSON.
+            Parameters:
+                -
+            Returns:
+                dict: The object in dictionary format.
+        """
         relationships = self.__mapper__.relationships.keys()
         
         if len(self._json_values) == 0:
@@ -93,7 +106,8 @@ class AssetType(Model):
     __tablename__ = 'asset_types'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, unique=True, nullable=False)
+    quote_type = Column(String, unique=True, nullable=False)
     unit_type = Column(String, nullable=False)
     assets = relationship('Asset', back_populates='asset_type')
 
-    _json_values = ['id', 'name', 'unit_type']
+    _json_values = ['id', 'name', 'quote_type', 'unit_type']

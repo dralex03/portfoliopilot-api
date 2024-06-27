@@ -13,8 +13,7 @@ DATABASE_URL = postgresql+psycopg2://username:password@host:port/database_name
 ```
   * Replace the username, password, host, port and database_name placeholders with your actual database credentials
 
-  * If you are running the database tests locally, make sure that the ```DATABASE_URL``` for the production database is replaced with the
-    one for the test database
+  * If you are running the database tests locally, make sure that the `DATABASE_URL` is set to `sqlite:///:memory:`
 ### Flask Settings
   * Settings for dev environment:
 ```
@@ -50,6 +49,20 @@ JWT_SECRET_KEY=super_secret_key
 
 
 ## Running Tests
+
+Use the following `.env` for running tests:
+
+```
+# PostgreSQL Database
+DATABASE_URL = sqlite:///:memory:
+
+# Flask
+FLASK_APP=src
+FLASK_DEBUG=1
+
+# JWT Auth
+JWT_SECRET_KEY=super_secret_key
+```
 
 Simply run `pytest` in the root directory to run all available tests.
 
