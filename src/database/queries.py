@@ -6,13 +6,13 @@ from typing import Callable
 
 def call_database_function(function: Callable):
     """
-        Handles Errors for every query, in order to improve code quality by avoiding redundant try and except blocks
-        Furthermore a commit after every transaction is ensured so inconsistencies are avoided
-        In addition on error the database session gets rolled backed and in every case closed
-    Args:
-        Callable function
-    Returns:
-        The result of the passed function or the error with the name of the failed function
+    Handles Errors for every query, in order to improve code quality by avoiding redundant try and except blocks
+    Furthermore a commit after every transaction is ensured so inconsistencies are avoided
+    In addition on error the database session gets rolled backed and in every case closed
+        Parameters:
+            Callable function;
+        Returns:
+            Any: The result of the passed function or the error with the name of the failed function;
     """
 
     @wraps(function)
