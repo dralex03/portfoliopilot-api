@@ -42,7 +42,7 @@ def get_test_users_register():
         (None, 'password123!', False, 400, ApiErrors.field_wrong_type('email', 'string')),
     ]
 
-@pytest.mark.parametrize("email,password,valid,status_code,message", get_test_users_register())
+@pytest.mark.parametrize('email,password,valid,status_code,message', get_test_users_register())
 def test_user_registration(test_client: FlaskClient, email: str, password: str, valid: bool, status_code: int, message: str):
     """
     Parametrized test to the user registration endpoint for correct behavior.
@@ -104,7 +104,7 @@ def get_test_users_login():
         (None, 'password123!', False, 400, ApiErrors.field_wrong_type('email', 'string')),
     ]
 
-@pytest.mark.parametrize("email,password,valid,status_code,message", get_test_users_login())
+@pytest.mark.parametrize('email,password,valid,status_code,message', get_test_users_login())
 def test_user_login(test_client: FlaskClient, email: str, password: str, valid: bool, status_code: int, message: str):
     """
     Parametrized test to the user login endpoint for correct behavior.
@@ -143,8 +143,6 @@ def test_user_login(test_client: FlaskClient, email: str, password: str, valid: 
         assert response.json['message'] == message
 
 
-# TODO: Issue with UUIDs as sqlite doesnt understand postgresql UUIDs
-
 def get_test_users_refresh_session():
     return [
         # Valid Test Cases
@@ -159,7 +157,7 @@ def test_user_login(test_client: FlaskClient, email: str, password: str):
 
     response = test_client.get('/user/refresh',
                                 headers={
-                                    "Authorization": "Bearer " + auth_token
+                                    'Authorization': 'Bearer ' + auth_token
                                 })
     
     assert response.status_code == 200
