@@ -18,7 +18,7 @@ user = Blueprint('user', __name__)
 user.register_blueprint(user_portfolios, url_prefix='/portfolios')
 
 
-@user.route('/register', methods = ['POST'])
+@user.route('/register', methods=['POST'])
 def register():
     """
     Handles POST requests to /user/register 
