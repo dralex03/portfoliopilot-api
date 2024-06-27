@@ -33,7 +33,7 @@ def insert_new_asset(name: str, asset_type_id: str):
 
 
 def insert_new_asset_type(name: str):
-    new_asset_type = AssetType(name=name, unit_type=name)
+    new_asset_type = AssetType(name=name, quote_type=name, unit_type=name)
     session.add(new_asset_type)
     session.commit()
     return new_asset_type

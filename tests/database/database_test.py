@@ -207,7 +207,7 @@ def test_asset_deletion(session: Session):
 
 def test_asset_type_insertion(session: Session):
     NAME = 'TATI'
-    new_asset_type = add_new_asset_type(NAME, NAME)
+    new_asset_type = add_new_asset_type(NAME, NAME, NAME)
 
     fetched_asset_type = session.query(AssetType).filter_by(id=new_asset_type.id).first()
 
@@ -215,7 +215,7 @@ def test_asset_type_insertion(session: Session):
     assert fetched_asset_type.name == new_asset_type.name
 
     with pytest.raises(Exception):
-        add_new_asset_type(NAME, NAME)
+        add_new_asset_type(NAME, NAME, NAME)
 
 
 def test_get_asset_type_by_name(session: Session):

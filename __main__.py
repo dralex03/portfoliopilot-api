@@ -1,5 +1,5 @@
 from flask.cli import FlaskGroup
-from src.database.setup import setup_database
+from src.database.setup import create_db_schema
 from src import create_app
 
 
@@ -9,7 +9,7 @@ if __name__ == "__main__":
     cli = FlaskGroup(app)
 
     # Setup database and start flask app
-    setup_database()
+    create_db_schema()
     cli()
 
 
