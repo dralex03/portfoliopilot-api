@@ -1,5 +1,7 @@
 from flask.testing import FlaskClient
 
+from src.constants.errors import ApiErrors
+
 def login_user(client: FlaskClient, email: str, password: str) -> str:
     """
     Helper function that uses the test client to login a user
@@ -16,6 +18,12 @@ def login_user(client: FlaskClient, email: str, password: str) -> str:
                                 'email': email,
                                 'password': password
                            })
+    
+    response_json = response.get_json()
+    if 'message' in response_json and response_json['message'] == ApiErrors.User.login_invalid_credentials:
+        return register_user(client, email, password)
+    
+    assert response.status_code == 200
     
     return response.json['response']['auth_token']
 
@@ -36,4 +44,30 @@ def register_user(client: FlaskClient, email: str, password: str) -> str:
                                 'password': password
                            })
     
+    assert response.status_code == 200
+
     return response.json['response']['auth_token']
+
+
+def create_portfolio(client: FlaskClient, auth_token: str, name: str) -> str:
+    """
+    Helper function that uses the test client to create a new portfolio
+    for a given user (auth_token).
+        Parameters:
+            FlaskClient client;
+            str auth_token;
+            str name;
+        Returns:
+            str: the ID of the new portfolio.
+    """
+    response = client.post('/user/portfolios/create',
+                           json={
+                                'name': name
+                           },
+                           headers={
+                               'Authorization': 'Bearer ' + auth_token
+                           })
+    
+    assert response.status_code == 200
+
+    return response.json['response']['id']

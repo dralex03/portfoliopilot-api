@@ -151,7 +151,16 @@ def get_test_users_refresh_session():
     ]
 
 @pytest.mark.parametrize("email,password", get_test_users_refresh_session())
-def test_user_login(test_client: FlaskClient, email: str, password: str):
+def test_user_refresh(test_client: FlaskClient, email: str, password: str):
+    """
+    Parametrized test to the user refresh endpoint for correct behavior.
+        Parameters:
+            FlaskClient test_client;
+            str email;
+            str password;
+        Returns:
+            -
+    """
     auth_token = login_user(test_client, email, password)
     assert auth_token is not None
 

@@ -3,7 +3,7 @@ import pytest
 from flask.testing import FlaskClient
 
 from src.constants.errors import ApiErrors
-from tests.api.routes.helper_requests import register_user
+from tests.api.routes.helper_requests import login_user
 
 
 def get_all_post_urls_with_json():
@@ -40,7 +40,7 @@ def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: b
 
     auth_token = None
     if login:
-        auth_token = register_user(test_client, 'john.doe@example.com', 'Password123!')
+        auth_token = login_user(test_client, 'john.doe@example.com', 'Password123!')
     
     # Test invalid JSON body
     if method == 'POST':
