@@ -1,6 +1,7 @@
 from flask import Flask
 
 from src.routes.user import user
+from src.routes.assets import assets
 
 
 def create_app():
@@ -16,5 +17,6 @@ def create_app():
 
     # Register Blueprints
     app.register_blueprint(user, url_prefix='/user')
+    app.register_blueprint(assets, url_prefix='/assets')
 
     return app

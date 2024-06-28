@@ -109,3 +109,11 @@ class ApiErrors:
         portfolio_element_asset_invalid_type = 'The quote type for this asset is not supported.'
         portfolio_element_asset_invalid_ticker = 'No Asset was found for this ticker.'
 
+
+    class Assets:
+        """
+        This class contains all error messages for /assets/...
+        """
+
+        # Input Errors
+        search_missing_query = 'Missing required query parameter "query".'
