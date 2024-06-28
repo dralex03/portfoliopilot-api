@@ -15,6 +15,12 @@ class ApiErrors:
             - limit (str): Required limit for the number field.
             - scope (str): Whether field needs to be below or above this.
             - Returns: str
+        missing_query_param(param):
+            - param (str): Key of the missing query parameter.
+            - Returns: str
+        invalid_query_param(param):
+            - param (str): Key of the invalid query parameter.
+            - Returns: str
         delete_portfolio_by_id_error(data_type, data_id):
             - data_type (str): Type of data that failed to delete. 
             - data_id (str): ID of the data that failed to delete. 
@@ -47,6 +53,15 @@ class ApiErrors:
                 return f'Field "{field_name}" needs to be equal to or less than {limit}.'
             case '<':
                 return f'Field "{field_name}" needs to be less than {limit}.'
+            
+
+    @staticmethod
+    def missing_query_param(param: str) -> str:
+        return f'Missing required query parameter "{param}".'
+    
+    @staticmethod
+    def invalid_query_param(param: str) -> str:
+        return f'Invalid value for query parameter "{param}".'
             
 
     @staticmethod
@@ -115,5 +130,9 @@ class ApiErrors:
         This class contains all error messages for /assets/...
         """
 
+        # Internal errors
+        ticker_price_data_error = 'Unexpected error occurred while fetching price data.'
+
         # Input Errors
-        search_missing_query = 'Missing required query parameter "query".'
+        ticker_info_missing_ticker = 'No ticker found in URL.'
+        ticker_not_found = 'No data for ticker was found.'

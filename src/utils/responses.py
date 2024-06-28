@@ -60,6 +60,23 @@ def generate_bad_request_response(message: str):
     return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
 
 
+def generate_not_found_response(message: str):
+    """
+    Generates a flask response for not found (404).
+    Parameters:
+        str message;
+    Returns:
+        tuple:
+            Response: Flask Response, contains the response_object dict
+            int: the response status code
+    """
+    response_object = {
+        'success': False,
+        'message': message
+    }
+    return make_response(jsonify(response_object)), status.HTTP_404_NOT_FOUND
+
+
 def generate_auth_token_response(user_id: str, success_message: str):
     """
     Generate an authentication token for a given user ID and return the appropriate Flask response.
