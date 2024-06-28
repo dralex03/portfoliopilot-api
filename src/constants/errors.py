@@ -134,5 +134,4 @@ class ApiErrors:
         ticker_price_data_error = 'Unexpected error occurred while fetching price data.'
 
         # Input Errors
-        ticker_info_missing_ticker = 'No ticker found in URL.'
         ticker_not_found = 'No data for ticker was found.'

@@ -16,7 +16,7 @@ assets = Blueprint('assets', __name__)
 
 
 @assets.route('/search', methods=['GET'])
-def search_assets():
+def get_search_assets():
     """
     Handles GET requests to /assets/search, used to search assets.
         Parameters:
@@ -57,12 +57,6 @@ def ticker_info(ticker: str):
                 Response: Flask Response, contains the response_object dict
                 int: the response status code
     """
-
-    # "ticker" is a required parameter
-    if len(ticker) <= 0:
-        return generate_bad_request_response(
-            ApiErrors.Assets.ticker_info_missing_ticker
-            )
     
     asset_info = get_general_info(ticker)
 
@@ -72,7 +66,7 @@ def ticker_info(ticker: str):
     
     # Add extra data for ETFs
     if asset_info.get('quoteType') == 'ETF':
-        asset_info['etf_data'] = get_etf_info(ticker)
+        asset_info['etfData'] = get_etf_info(ticker)
 
     return generate_success_response(asset_info)
 
@@ -89,12 +83,6 @@ def ticker_price_data(ticker: str):
                 Response: Flask Response, contains the response_object dict
                 int: the response status code
     """
-
-    # "ticker" is a required parameter
-    if len(ticker) <= 0:
-        return generate_bad_request_response(
-            ApiErrors.Assets.ticker_info_missing_ticker
-            )
     
     period = request.args.get('period')
     interval = request.args.get('interval')
@@ -126,7 +114,7 @@ def ticker_price_data(ticker: str):
         price_data = get_price_data(ticker, period, interval)
     except YFChartError as e: # invalid interval for requested period
         return generate_bad_request_response(str(e))
-    except Exception as e:
+    except Exception as e: # pragma: no cover
         return generate_internal_error_response(
             ApiErrors.Assets.ticker_price_data_error, e
             )
