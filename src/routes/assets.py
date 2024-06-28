@@ -75,7 +75,7 @@ def ticker_info(ticker: str):
 def ticker_price_data(ticker: str):
     """
     Handles GET requests to /assets/ticker/<ticker>/priceData,
-    used to get information about a specific ticker.
+    used to get price data of a specific ticker.
         Parameters:
             str ticker;
         Returns:

@@ -144,6 +144,14 @@ def test_user_login(test_client: FlaskClient, email: str, password: str, valid: 
 
 
 def get_test_users_refresh_session():
+    """
+    Helper function that returns a list of test data.
+        Parameters:
+            -
+        Returns:
+            List[Tuple]: A list of test data for testing user
+                session refresh request.
+    """
     return [
         # Valid Test Cases
         ('john.doe@example.com', 'Password123!'),
