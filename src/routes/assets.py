@@ -8,6 +8,7 @@ from src.constants.countries import COUNTRIES
 from src.market_data.search import search_assets
 from src.market_data.general_data import get_general_info
 from src.market_data.price_data import get_price_data, VALID_INTERVALS, VALID_PERIODS
+from src.market_data.etf_data import get_etf_info
 
 
 # Create blueprint which is used in the flask app
@@ -68,6 +69,10 @@ def ticker_info(ticker: str):
     # Check if asset with this ticker exists
     if asset_info is None:
         return generate_not_found_response(ApiErrors.Assets.ticker_not_found)
+    
+    # Add extra data for ETFs
+    if asset_info.get('quoteType') == 'ETF':
+        asset_info['etf_data'] = get_etf_info(ticker)
 
     return generate_success_response(asset_info)
 
