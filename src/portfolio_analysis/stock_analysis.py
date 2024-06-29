@@ -1,9 +1,10 @@
 from collections import Counter
-from src.database.models import Portfolio, PortfolioElement, User, Asset, AssetType
+from src.database.models import PortfolioElement, Asset
 from src.database.setup import session
 from src.market_data.stock_data import get_stock_classification
 
 
+# TODO: not used yet
 def get_stock_portfolio_distribution(portfolio_id: int):
     """
     Calculates the country and sector distribution of a given portfolio. Also gives back the average P/E

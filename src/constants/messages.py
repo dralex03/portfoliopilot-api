@@ -34,6 +34,7 @@ class ApiMessages:
                 - Returns: str
         """
 
+        @staticmethod
         def p_element_deleted_cause_count_zero(p_element_id: str) -> str:
             return f'Portfolio Element with ID "{p_element_id}" was deleted because count was zero or less.'
 

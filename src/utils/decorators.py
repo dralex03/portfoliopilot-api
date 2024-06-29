@@ -9,7 +9,6 @@ from src.constants.http_status_codes import HTTP_401_UNAUTHORIZED
 from src.utils.jwt_auth import decode_auth_token
 from src.utils.responses import *
 from src.database import queries, models
-from src.constants import http_status_codes as status
 from src.constants.errors import ApiErrors
 
 
@@ -132,10 +131,7 @@ def validate_portfolio_owner(func: Callable):
             return func(user_id=user_id, portfolio=portfolio, *args, **kwargs)
         else:
             # For security reasons, return 404
-            response_object = {
-                'success': False,
-                'message': ApiErrors.data_by_id_not_found('portfolio', portfolio_id)
-            }
-            return make_response(jsonify(response_object)), status.HTTP_404_NOT_FOUND
+            message = ApiErrors.data_by_id_not_found('portfolio', portfolio_id)
+            return generate_not_found_response(message)
         
     return decorator

@@ -1,7 +1,6 @@
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
 
-from src.constants import http_status_codes as status
 from src.database import queries, models
 from src.utils.decorators import jwt_required, validate_portfolio_owner
 from src.utils.responses import *
@@ -84,11 +83,8 @@ def delete_user_portfolio(user_id: str, portfolio: models.Portfolio):
     else: 
         # Will only be reached in rare edge cases as the
         # "validate_portfolio_owner" decorator handles this case already.
-        response_object = {
-            'success': False,
-            'message': ApiErrors.data_by_id_not_found('portfolio', portfolio.id)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_404_NOT_FOUND
+        message = ApiErrors.data_by_id_not_found('portfolio', portfolio.id)
+        return generate_not_found_response(message)
 
 
 @user_portfolios.route('/create', methods = ['POST'])
@@ -362,11 +358,9 @@ def delete_element_from_user_portfolio(user_id: str, portfolio: models.Portfolio
     if element_deleted == True:
         return generate_success_response(ApiMessages.delete_data_by_id_success('portfolio element', p_element_id))
     else:
-        response_object = {
-            'success': False,
-            'message': ApiErrors.data_by_id_not_found('portfolio element', p_element_id)
-        }
-        return make_response(jsonify(response_object)), status.HTTP_404_NOT_FOUND
+        message = ApiErrors.data_by_id_not_found('portfolio element',
+                                                 p_element_id)
+        return generate_not_found_response(message)
 
 
 @user_portfolios.route('/<portfolio_id>/<p_element_id>', methods = ['PUT'])
