@@ -1,10 +1,10 @@
 from flask import Blueprint, request
 from yfinance.exceptions import YFChartError
+from yahooquery.utils.countries import COUNTRIES
 
 from src.utils.responses import *
 from src.utils.request_parser import *
 from src.constants.errors import ApiErrors
-from src.constants.countries import COUNTRIES
 from src.market_data.search import search_assets
 from src.market_data.general_data import get_general_info
 from src.market_data.price_data import get_price_data, VALID_INTERVALS, VALID_PERIODS
