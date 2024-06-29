@@ -325,6 +325,7 @@ def test_add_portfolio_element(test_client: FlaskClient,
                                       'Authorization': 'Bearer ' + auth_token
                                   })
 
+    print(response.get_json())
     assert response.status_code == status_code
     assert response.is_json
 

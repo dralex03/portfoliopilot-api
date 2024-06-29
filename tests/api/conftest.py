@@ -3,7 +3,7 @@ import pytest
 from flask.testing import FlaskClient
 
 from src import create_app
-from src.database.setup import engine, Session
+from src.database.setup import engine, Session, initialize_default_data
 from src.database.models import Base
 
 
@@ -21,6 +21,7 @@ def setup_session():
         raise RuntimeError('Use SQLite Database to run tests')
     
     Base.metadata.create_all(engine)
+    initialize_default_data()
     try:
         # Creates a session and gives it to the testing function
         with Session() as session:

@@ -1,5 +1,5 @@
 import pytest
-from src.database.setup import engine, Session
+from src.database.setup import engine, Session, initialize_default_data
 from src.database.models import Base
 
 @pytest.fixture(scope='function')
@@ -9,6 +9,7 @@ def session():
         raise RuntimeError('Use SQLite Database to run tests')
     
     Base.metadata.create_all(engine)
+    initialize_default_data()
     try:
         # Creates a session and gives it to the testing function
         with Session() as session:
