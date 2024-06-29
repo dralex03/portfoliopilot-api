@@ -135,6 +135,7 @@ def create_user_portfolio(user_id: str):
 
 @user_portfolios.route('/<portfolio_id>', methods = ['PUT'])
 @jwt_required
+@validate_portfolio_owner
 def update_user_portfolio(user_id: str, portfolio: models.Portfolio):
     """
     Handles PUT requests to /user/portfolios/<portfolio_id> where <portfolio_id> is the ID of a users portfolio.
@@ -234,6 +235,8 @@ def add_element_to_user_portfolio(user_id: str, portfolio: models.Portfolio):
         return generate_bad_request_response(ApiErrors.field_wrong_type('order_fee', 'float'))
     
     # Validating field values
+    if not len(asset_ticker) > 0:
+        return generate_bad_request_response(ApiErrors.field_is_empty('asset_ticker'))
     if not count > 0:
         return generate_bad_request_response(ApiErrors.num_field_out_of_limit('count', '0', '>'))
     if not buy_price > 0:
