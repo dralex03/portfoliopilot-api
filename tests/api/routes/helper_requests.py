@@ -71,3 +71,35 @@ def create_portfolio(client: FlaskClient, auth_token: str, name: str) -> str:
     assert response.status_code == 200
 
     return response.json['response']['id']
+
+
+def get_portfolio(client: FlaskClient, auth_token: str, name: str) -> str:
+    """
+    Helper function that uses the test client to get an existing portfolio
+    for a given user (auth_token).
+    If portfolio doesnt exist, its created.
+        Parameters:
+            FlaskClient client;
+            str auth_token;
+            str name;
+        Returns:
+            str: the ID of the portfolio.
+    """
+    response = client.get('/user/portfolios',
+                           headers={
+                               'Authorization': 'Bearer ' + auth_token
+                           })
+    
+    assert response.status_code == 200
+
+    try:
+        portfolio_id = next(
+            p for p in response.json['response'] if p['name'] == name
+        )['id']
+    except:
+        portfolio_id = None
+
+    if portfolio_id is None:
+        return create_portfolio(client, auth_token, name)
+
+    return portfolio_id
