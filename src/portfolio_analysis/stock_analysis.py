@@ -1,5 +1,6 @@
 from collections import Counter
 from src.database.models import PortfolioElement, Asset
+from src.database.queries import get_ticker_symbols_of_portfolio
 from src.database.setup import session
 from src.market_data.stock_data import get_stock_classification
 
@@ -13,14 +14,7 @@ def get_stock_portfolio_distribution(portfolio_id: int):
         Returns:
             Tuple: country_weights, sector_weights, average_pe if data is available
     """
-    tickers = [
-        ticker_symbol for (ticker_symbol,) in (
-            session.query(Asset.ticker_symbol)
-            .join(PortfolioElement, PortfolioElement.asset_id == Asset.id)
-            .filter(PortfolioElement.portfolio_id == portfolio_id)
-            .all()
-        )
-    ]
+    tickers = get_ticker_symbols_of_portfolio(portfolio_id)
 
     countries = []
     sectors = []
