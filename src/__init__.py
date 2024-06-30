@@ -13,7 +13,7 @@ def create_app():
             Flask: The Flask Application
     """
 
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder=None)
 
     # Register Blueprints
     app.register_blueprint(user, url_prefix='/user')
