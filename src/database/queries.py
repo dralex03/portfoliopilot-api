@@ -417,6 +417,7 @@ def delete_asset_type(asset_type_id: str):
         return False
 
 
+@call_database_function
 def get_ticker_symbols_of_portfolio(portfolio_id: int):
     """
     Fetches the ticker symbols associated with a specific portfolio
