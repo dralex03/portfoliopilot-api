@@ -9,7 +9,7 @@ from src.constants.errors import ApiErrors
 from src.constants.messages import ApiMessages
 from src.market_data.general_data import get_general_info
 from src.constants.asset_types import QUOTE_TYPE_LIST
-from src.portfolio_analysis import get_stock_portfolio_distribution
+from src.portfolio_analysis.stock_analysis import get_stock_portfolio_distribution
 
 # Create blueprint which is used in the flask app
 user_portfolios = Blueprint('portfolio', __name__)
