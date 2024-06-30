@@ -2,44 +2,23 @@ import bcrypt
 from flask import Blueprint, request, make_response, jsonify
 
 from src.database import queries
+from src.database.models import User
 from src.utils.input_validation import is_valid_email, is_strong_password
-from src.utils import jwt_auth
 from src.constants import http_status_codes as status
 from src.utils.decorators import jwt_required
+from src.utils.responses import *
+from src.utils.request_parser import *
+from src.routes.user_portfolios import user_portfolios
+from src.constants.errors import ApiErrors
+from src.constants.messages import ApiMessages
 
 # Create blueprint which is used in the flask app
 user = Blueprint('user', __name__)
 
-def generate_auth_token_response(user_id: int, success_message: str, success_status: int):
-    """
-    Generate an authentication token for a given user ID and return the appropriate Flask response.
-    Parameters:
-        int user_id;
-        str success_message;
-        int success_status;
-    Returns:
-        tuple:
-            Response: Flask Response, contains the response_object dict
-            int: the response status code
-    """
-    auth_token = jwt_auth.encode_auth_token(user_id)
-
-    if not auth_token:
-        response_object = {
-            'success': False,
-            'message': 'Error generating Auth Token.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_500_INTERNAL_SERVER_ERROR
-    
-    response_object = {
-        'success': True,
-        'message': success_message,
-        'auth_token': auth_token
-    }
-    return make_response(jsonify(response_object)), success_status
+user.register_blueprint(user_portfolios, url_prefix='/portfolios')
 
 
-@user.route('/register', methods = ['POST'])
+@user.route('/register', methods=['POST'])
 def register():
     """
     Handles POST requests to /user/register 
@@ -51,45 +30,52 @@ def register():
                 int: the response status code
     """
 
-    post_data = request.get_json()
+    # Parsing the request body
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response(ApiErrors.invalid_json, e)
 
-    user_email = post_data.get('email')
-    user_password = post_data.get('password')
+    user_email = request_body.get('email')
+    user_password = request_body.get('password')
+
+    # Validating field types
+    if not isinstance(user_email, str):
+        return generate_bad_request_response(ApiErrors.field_wrong_type('email', 'string'))
+    if not isinstance(user_password, str):
+        return generate_bad_request_response(ApiErrors.field_wrong_type('password', 'string'))
 
     # Validate email input
     if not is_valid_email(user_email):
-        response_object = {
-            'success': False,
-            'message': 'Invalid Email address.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+        return generate_bad_request_response(ApiErrors.User.register_invalid_email)
     
     # Validate password input
     if not is_strong_password(user_password):
-        response_object = {
-            'success': False,
-            'message': 'Password does not meet requirements.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+        return generate_bad_request_response(ApiErrors.User.register_invalid_password)
 
     # Check if user already exists
-    user = queries.get_user_by_email(user_email)
+    try:
+        user: User = queries.get_user_by_email(user_email)
+    except Exception as e: # pragma: no cover
+        return generate_internal_error_response(ApiErrors.User.get_user_by_email_error, e)
 
     # User does not exist yet
     if not user:
         # Hash password with bcrypt and insert new user into database
         hashed_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
-        user = queries.add_new_user(user_email, hashed_password.decode())
 
-        return generate_auth_token_response(user.id, 'User created successfully.', status.HTTP_201_CREATED)
+        try:
+            user: User = queries.add_new_user(user_email, hashed_password.decode())
+        except Exception as e: # pragma: no cover
+            return generate_internal_error_response(ApiErrors.User.add_new_user_error, e)
+
+        return generate_auth_token_response(str(user.id), ApiMessages.User.register_success)
     
     # User already exists
     else:
-        response_object = {
-            'success': False,
-            'message': 'User already exists. Please log in.'
-        }
-        return make_response(jsonify(response_object)), status.HTTP_400_BAD_REQUEST
+        return generate_bad_request_response(ApiErrors.User.register_already_exists)
 
 @user.route('/login', methods = ['POST'])
 def login():
@@ -103,35 +89,50 @@ def login():
                 int: the response status code
     """
 
-    post_data = request.get_json()
+    # Parsing the request body
+    try:
+        request_body = parse_json_request_body(request)
+    except ValueError as e:
+        return generate_bad_request_response(str(e))
+    except Exception as e:
+        return generate_internal_error_response(ApiErrors.invalid_json, e)
+    
+    user_email = request_body.get('email')
+    user_password = request_body.get('password')
 
-    user_email = post_data.get('email')
-    user_password = post_data.get('password')
+    # Validating field types
+    if not isinstance(user_email, str):
+        return generate_bad_request_response(ApiErrors.field_wrong_type('email', 'string'))
+    if not isinstance(user_password, str):
+        return generate_bad_request_response(ApiErrors.field_wrong_type('password', 'string'))
 
     # Check if user exists
-    user = queries.get_user_by_email(user_email)
+    try:
+        user: User = queries.get_user_by_email(user_email)
+    except Exception as e: # pragma: no cover
+        return generate_internal_error_response(ApiErrors.User.get_user_by_email_error, e)
 
     # User does exist
     if user:
         password_check = bcrypt.checkpw(user_password.encode('utf-8'), user.password.encode('utf-8'))
 
         if user.email == user_email and password_check:
-            return generate_auth_token_response(user.id, 'Login successful.', status.HTTP_200_OK)
+            return generate_auth_token_response(str(user.id), ApiMessages.User.login_success)
 
     # User does not exist or password is wrong
     response_object = {
         'success': False,
-        'message': 'Invalid email or password.'
+        'message': ApiErrors.User.login_invalid_credentials
     }
     return make_response(jsonify(response_object)), status.HTTP_401_UNAUTHORIZED
 
 @user.route('/refresh', methods=['GET'])
 @jwt_required
-def refresh_session(user_id: int):
+def refresh_session(user_id: str):
     """
     Handles GET requests to /user/refresh, used to refresh login sessions
         Parameters:
-            int user_id;
+            str user_id;
         Returns:
             tuple:
                 Response: Flask Response, contains the response_object dict
@@ -139,4 +140,4 @@ def refresh_session(user_id: int):
     """
     
     # Generate a new jwt and return it, as session was already validated by jwt_required decorator
-    return generate_auth_token_response(user_id, 'Session refreshed successfully.', status.HTTP_200_OK)
+    return generate_auth_token_response(user_id, ApiMessages.User.session_refresh_success)

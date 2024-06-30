@@ -1,17 +1,17 @@
 from collections import Counter
-from src.database.models import Portfolio, PortfolioElement, User, Asset, AssetType
+from src.database.models import PortfolioElement, Asset
 from src.database.setup import session
 from src.market_data.stock_data import get_stock_classification
 
 
+# TODO: not used yet
 def get_stock_portfolio_distribution(portfolio_id: int):
     """
     Calculates the country and sector distribution of a given portfolio. Also gives back the average P/E
-    Args:
-        int portfolio_id
-
-    Returns:
-        JSON country_weights, sector_weights, average_pe if data is available
+        Parameters:
+            int portfolio_id;
+        Returns:
+            Tuple: country_weights, sector_weights, average_pe if data is available
     """
     tickers = [
         ticker_symbol for (ticker_symbol,) in (

@@ -1,14 +1,14 @@
 import jwt
 import datetime
-from flask import current_app
 
 from src.config import JWT_EXPIRY, JWT_SECRET_KEY
+from src.constants.errors import ApiErrors
 
-def encode_auth_token(user_id: int):
+def encode_auth_token(user_id: str):
     """
     Generates the JWT Auth Token.
         Parameters:
-            int user_id;
+            str user_id;
         Returns:
             str: The JWT Token
     """
@@ -25,7 +25,6 @@ def encode_auth_token(user_id: int):
             algorithm='HS256'
         )
     except Exception as e:
-        current_app.logger.error("Error generating JWT Token: " + e)
         return None
     
 def decode_auth_token(auth_token: str):
@@ -36,7 +35,7 @@ def decode_auth_token(auth_token: str):
         Returns:
             tuple:
                 bool: True if the auth token is valid, else False
-                int: the user_id, if the token is valid
+                str: the user_id, if the token is valid
     """
 
     try:
@@ -50,6 +49,6 @@ def decode_auth_token(auth_token: str):
         )
         return (True, payload['sub'])
     except jwt.ExpiredSignatureError:
-        return (False, 'Signature expired. Please log in again.')
+        return (False, ApiErrors.JwtAuth.jwt_token_expired)
     except jwt.InvalidTokenError:
-        return (False, 'Invalid token. Please log in.')
+        return (False, ApiErrors.JwtAuth.jwt_token_invalid)

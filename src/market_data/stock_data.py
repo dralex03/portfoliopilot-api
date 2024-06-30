@@ -1,15 +1,14 @@
 import yfinance as yf
 
 
+# TODO: not used yet
 def get_stock_info(ticker: str):
     """
-    Returns specific stock information from yahoo finance
-
-    Args:
-        str ticker
-
-    Returns:
-        JSON
+    Returns specific stock information from yahoo finance.
+        Parameters:
+            str ticker;
+        Returns:
+            dict: Information about the stock.
     """
     ticker_obj = yf.Ticker(ticker)
     info = ticker_obj.info
@@ -22,15 +21,15 @@ def get_stock_info(ticker: str):
     return info
 
 
+# TODO: not used yet
 def get_stock_classification(ticker: str):
     """
-    Returns the country, sector and pe of a given stock ticker or None if this information is not available
-
-    Args:
-        str ticker
-
-    Returns:
-        JSON country, sector and trailingPE if Data is available
+    Returns the country, sector and pe of a given stock ticker or None if this information is not available.
+        Parameters:
+            str ticker;
+        Returns:
+            Tuple: country, sector and trailingPE if Data is available 
+            else None
     """
 
     stock = yf.Ticker(ticker)
