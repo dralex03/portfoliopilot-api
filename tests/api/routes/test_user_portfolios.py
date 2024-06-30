@@ -1,14 +1,10 @@
 import pytest
-
 from flask.testing import FlaskClient
 
 from src.constants.errors import ApiErrors
 from src.constants.messages import ApiMessages
-
-from tests.api.routes.helper_requests import (
-    login_user, create_portfolio, get_portfolio
-)
-
+from tests.api.routes.helper_requests import (create_portfolio, get_portfolio,
+                                              login_user)
 
 
 def get_test_portfolios_create():
@@ -26,8 +22,9 @@ def get_test_portfolios_create():
         (None, False, 400, ApiErrors.field_wrong_type('name', 'string')),
     ]
 
+
 @pytest.mark.parametrize('portfolio_name,valid,status_code,message', get_test_portfolios_create())
-def test_create_user_portfolio(test_client: FlaskClient, 
+def test_create_user_portfolio(test_client: FlaskClient,
                                portfolio_name: str,
                                valid: bool,
                                status_code: int,
@@ -44,7 +41,8 @@ def test_create_user_portfolio(test_client: FlaskClient,
             -
     """
 
-    auth_token = login_user(test_client, 'john.doe@example.com', 'Password123!')
+    auth_token = login_user(
+        test_client, 'john.doe@example.com', 'Password123!')
     assert auth_token is not None
 
     response = test_client.post('/user/portfolios/create',
@@ -66,7 +64,6 @@ def test_create_user_portfolio(test_client: FlaskClient,
         assert response.json['message'] == message
 
 
-
 def get_test_portfolios_update():
     """
     Helper function that returns a list of test data.
@@ -77,13 +74,15 @@ def get_test_portfolios_update():
     """
     return [
         ('Portfolio123', 'Portfolio1', True, 200, ''),
-        ('Test123', 'Portfolio1', False, 400, ApiErrors.Portfolio.portfolio_already_exists),
+        ('Test123', 'Portfolio1', False, 400,
+         ApiErrors.Portfolio.portfolio_already_exists),
         ('Test1', '', False, 400, ApiErrors.field_is_empty('name')),
         ('Test2', None, False, 400, ApiErrors.field_wrong_type('name', 'string')),
     ]
 
+
 @pytest.mark.parametrize('p_name,name_new,valid,status_code,message', get_test_portfolios_update())
-def test_update_user_portfolio(test_client: FlaskClient, 
+def test_update_user_portfolio(test_client: FlaskClient,
                                p_name: str,
                                name_new: str,
                                valid: bool,
@@ -108,14 +107,13 @@ def test_update_user_portfolio(test_client: FlaskClient,
     portfolio_id = create_portfolio(test_client, auth_token, p_name)
     assert portfolio_id is not None
 
-    
     response = test_client.put(f'/user/portfolios/{portfolio_id}',
-                                  json={
-                                      'name': name_new
-                                  },
-                                  headers={
-                                      'Authorization': 'Bearer ' + auth_token
-                                  })
+                               json={
+        'name': name_new
+    },
+        headers={
+        'Authorization': 'Bearer ' + auth_token
+    })
 
     assert response.status_code == status_code
     assert response.is_json
@@ -131,7 +129,6 @@ def test_update_user_portfolio(test_client: FlaskClient,
     else:
         assert not response.json['success']
         assert response.json['message'] == message
-
 
 
 def get_test_portfolios():
@@ -163,7 +160,8 @@ def test_get_all_user_portfolios_no_elements(test_client: FlaskClient,
             -
     """
 
-    auth_token = login_user(test_client, 'jane.doe@example2.com', 'Password123!')
+    auth_token = login_user(
+        test_client, 'jane.doe@example2.com', 'Password123!')
     assert auth_token is not None
 
     portfolio_id = create_portfolio(test_client, auth_token, portfolio_name)
@@ -191,7 +189,8 @@ def test_get_all_user_portfolios_empty(test_client: FlaskClient):
             -
     """
 
-    auth_token = login_user(test_client, 'james.brown@example.com', 'Password123!')
+    auth_token = login_user(
+        test_client, 'james.brown@example.com', 'Password123!')
     assert auth_token is not None
 
     response = test_client.get('/user/portfolios',
@@ -225,7 +224,7 @@ def test_get_user_portfolio_and_delete(test_client: FlaskClient, portfolio_name:
     response = test_client.get(f'/user/portfolios/{portfolio_id}',
                                headers={
                                    'Authorization': 'Bearer ' + auth_token
-                               })
+    })
 
     assert response.status_code == 200
     assert response.is_json
@@ -236,24 +235,25 @@ def test_get_user_portfolio_and_delete(test_client: FlaskClient, portfolio_name:
     response = test_client.delete(f'/user/portfolios/{portfolio_id}',
                                   headers={
                                       'Authorization': 'Bearer ' + auth_token
-                                  })
+    })
 
     assert response.status_code == 200
     assert response.is_json
     assert response.json['success']
-    assert response.json['response'] == ApiMessages.delete_data_by_id_success('portfolio', portfolio_id)
+    assert response.json['response'] == ApiMessages.delete_data_by_id_success(
+        'portfolio', portfolio_id)
 
     # Testing deletion for already deleted portfolios
     response = test_client.delete(f'/user/portfolios/{portfolio_id}',
                                   headers={
                                       'Authorization': 'Bearer ' + auth_token
-                                  })
+    })
 
     assert response.status_code == 404
     assert response.is_json
     assert not response.json['success']
-    assert response.json['message'] == ApiErrors.data_by_id_not_found('portfolio', portfolio_id)
-
+    assert response.json['message'] == ApiErrors.data_by_id_not_found(
+        'portfolio', portfolio_id)
 
 
 def get_test_add_portfolio_element():
@@ -267,24 +267,35 @@ def get_test_add_portfolio_element():
     return [
         ('AAPL', 10.0, 150.0, 3.46, True, 200, ''),
         ('NVDA', 10, 100, 3, True, 200, ''),
-        
-        (None, 10.0, 150.0, 3.46, False, 400, ApiErrors.field_wrong_type('asset_ticker', 'string')),
-        ('AAPL', '10.0', 150.0, 3.46, False, 400, ApiErrors.field_wrong_type('count', 'float')),
-        ('AAPL', 10.0, '150.0', 3.46, False, 400, ApiErrors.field_wrong_type('buy_price', 'float')),
-        ('AAPL', 10.0, 150.0, '3.46', False, 400, ApiErrors.field_wrong_type('order_fee', 'float')),
 
-        ('', 10.0, 150.0, 3.46, False, 400, ApiErrors.field_is_empty('asset_ticker')),
-        ('AAPL', 0, 150.0, 3.46, False, 400, ApiErrors.num_field_out_of_limit('count', '0', '>')),
-        ('AAPL', 10.0, 0, 3.46, False, 400, ApiErrors.num_field_out_of_limit('buy_price', '0', '>')),
-        ('AAPL', 10.0, 150.0, -1, False, 400, ApiErrors.num_field_out_of_limit('order_fee', '0', '>=')),
+        (None, 10.0, 150.0, 3.46, False, 400,
+         ApiErrors.field_wrong_type('asset_ticker', 'string')),
+        ('AAPL', '10.0', 150.0, 3.46, False, 400,
+         ApiErrors.field_wrong_type('count', 'float')),
+        ('AAPL', 10.0, '150.0', 3.46, False, 400,
+         ApiErrors.field_wrong_type('buy_price', 'float')),
+        ('AAPL', 10.0, 150.0, '3.46', False, 400,
+         ApiErrors.field_wrong_type('order_fee', 'float')),
 
-        ('INVALID_TICKER', 10.0, 150.0, 3.46, False, 400, ApiErrors.Portfolio.portfolio_element_asset_invalid_ticker),
+        ('', 10.0, 150.0, 3.46, False, 400,
+         ApiErrors.field_is_empty('asset_ticker')),
+        ('AAPL', 0, 150.0, 3.46, False, 400,
+         ApiErrors.num_field_out_of_limit('count', '0', '>')),
+        ('AAPL', 10.0, 0, 3.46, False, 400,
+         ApiErrors.num_field_out_of_limit('buy_price', '0', '>')),
+        ('AAPL', 10.0, 150.0, -1, False, 400,
+         ApiErrors.num_field_out_of_limit('order_fee', '0', '>=')),
 
-        ('EURUSD=X', 10.0, 150.0, 3.46, False, 400, ApiErrors.Portfolio.portfolio_element_asset_invalid_type),
+        ('INVALID_TICKER', 10.0, 150.0, 3.46, False, 400,
+         ApiErrors.Portfolio.portfolio_element_asset_invalid_ticker),
+
+        ('EURUSD=X', 10.0, 150.0, 3.46, False, 400,
+         ApiErrors.Portfolio.portfolio_element_asset_invalid_type),
     ]
 
+
 @pytest.mark.parametrize('ticker,count,buy_price,order_fee,valid,status_code,message', get_test_add_portfolio_element())
-def test_add_portfolio_element(test_client: FlaskClient, 
+def test_add_portfolio_element(test_client: FlaskClient,
                                ticker: str,
                                count: float,
                                buy_price: float,
@@ -313,17 +324,16 @@ def test_add_portfolio_element(test_client: FlaskClient,
     portfolio_id = get_portfolio(test_client, auth_token, 'Portfolio123')
     assert portfolio_id is not None
 
-    
     response = test_client.post(f'/user/portfolios/{portfolio_id}/add',
-                                  json={
-                                      'asset_ticker': ticker,
-                                      'count': count,
-                                      'buy_price': buy_price,
-                                      'order_fee': order_fee
-                                  },
-                                  headers={
-                                      'Authorization': 'Bearer ' + auth_token
-                                  })
+                                json={
+        'asset_ticker': ticker,
+        'count': count,
+        'buy_price': buy_price,
+        'order_fee': order_fee
+    },
+        headers={
+        'Authorization': 'Bearer ' + auth_token
+    })
 
     print(response.get_json())
     assert response.status_code == status_code
@@ -336,7 +346,6 @@ def test_add_portfolio_element(test_client: FlaskClient,
         assert 'portfolio_id' in response.json['response']
         assert response.json['response']['portfolio_id'] == portfolio_id
 
-        
         assert 'count' in response.json['response']
         assert response.json['response']['count'] == float(count)
         assert 'buy_price' in response.json['response']
@@ -347,7 +356,7 @@ def test_add_portfolio_element(test_client: FlaskClient,
         assert 'asset' in response.json['response']
 
         asset = response.json['response']['asset']
-        
+
         assert 'name' in asset
         assert 'default_currency' in asset
         assert 'asset_type' in asset

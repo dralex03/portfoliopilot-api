@@ -13,7 +13,6 @@ class ApiMessages:
     def delete_data_by_id_success(data_type: str, data_id: str) -> str:
         return f'{data_type.capitalize()} with ID "{data_id}" deleted successfully.'
 
-
     class User:
         """
         This class contains all messages for /user/...
@@ -22,7 +21,6 @@ class ApiMessages:
         register_success = 'User created successfully.'
         login_success = 'Login successful.'
         session_refresh_success = 'Session refreshed successfully.'
-
 
     class Portfolio:
         """
@@ -37,4 +35,3 @@ class ApiMessages:
         @staticmethod
         def p_element_deleted_cause_count_zero(p_element_id: str) -> str:
             return f'Portfolio Element with ID "{p_element_id}" was deleted because count was zero or less.'
-

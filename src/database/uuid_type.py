@@ -1,7 +1,8 @@
 import uuid
 
-from sqlalchemy.types import TypeDecorator, CHAR
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.types import CHAR, TypeDecorator
+
 
 class UUID(TypeDecorator):
     """

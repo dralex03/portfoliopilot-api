@@ -1,7 +1,7 @@
 from flask import Flask
 
-from src.routes.user import user
-from src.routes.assets import assets
+from src.api.routes.assets import assets
+from src.api.routes.user import user
 
 
 def create_app():

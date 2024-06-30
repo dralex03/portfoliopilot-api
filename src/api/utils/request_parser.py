@@ -2,6 +2,7 @@ from flask import Request
 
 from src.constants.errors import ApiErrors
 
+
 def parse_json_request_body(request: Request):
     """
     Parses a JSON request body from a flask request.
@@ -19,5 +20,5 @@ def parse_json_request_body(request: Request):
         request_body = request.get_json()
     except Exception as e:
         raise e
-    
+
     return request_body

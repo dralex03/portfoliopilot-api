@@ -1,8 +1,10 @@
-import jwt
 import datetime
+
+import jwt
 
 from src.config import JWT_EXPIRY, JWT_SECRET_KEY
 from src.constants.errors import ApiErrors
+
 
 def encode_auth_token(user_id: str):
     """
@@ -26,7 +28,8 @@ def encode_auth_token(user_id: str):
         )
     except Exception as e:
         return None
-    
+
+
 def decode_auth_token(auth_token: str):
     """
     Decodes and validates the JWT auth token

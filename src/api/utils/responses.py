@@ -1,10 +1,9 @@
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-from flask import make_response, jsonify
+from flask import jsonify, make_response
 
-from src.utils import jwt_auth
+from src.api.utils import jwt_auth
 from src.constants import http_status_codes as status
-
 
 
 def generate_success_response(response: List[Dict[str, Any]] | Dict[str, Any] | str):
@@ -93,7 +92,7 @@ def generate_auth_token_response(user_id: str, success_message: str):
 
     if not auth_token:
         return generate_internal_error_response('Error generating Auth Token.', 'Unknown error occurred.')
-    
+
     response = {
         'message': success_message,
         'auth_token': auth_token

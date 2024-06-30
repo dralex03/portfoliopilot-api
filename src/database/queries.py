@@ -1,7 +1,9 @@
 from functools import wraps
-from src.database.models import Portfolio, PortfolioElement, User, Asset, AssetType
-from src.database.setup import session
 from typing import Callable
+
+from src.database.models import (Asset, AssetType, Portfolio, PortfolioElement,
+                                 User)
+from src.database.setup import session
 
 
 def call_database_function(function: Callable):
@@ -67,24 +69,6 @@ def add_new_user(email: str, password: str):
     return new_user
 
 
-# TODO: not used yet
-@call_database_function
-def delete_user_by_id(user_id: str):
-    """
-    Deletes a user based on the passed id
-        Parameters:
-            str user_id;
-        Returns:
-            Boolean True if the user was successfully deleted, False otherwise
-    """
-    user_to_delete = session.query(User).filter_by(id=user_id).first()
-    if user_to_delete:
-        session.delete(user_to_delete)
-        return True
-    else:
-        return False
-
-
 @call_database_function
 def add_portfolio(name: str, user_id: str):
     """
@@ -148,7 +132,8 @@ def delete_portfolio_by_id(portfolio_id: str):
         Returns:
             Boolean True if the Portfolio was successfully deleted, False otherwise
     """
-    portfolio_to_delete = session.query(Portfolio).filter_by(id=portfolio_id).first()
+    portfolio_to_delete = session.query(
+        Portfolio).filter_by(id=portfolio_id).first()
     if portfolio_to_delete:
         session.delete(portfolio_to_delete)
         return True
@@ -167,7 +152,8 @@ def update_portfolio_name(portfolio_id: str, new_portfolio_name: str):
             Portfolio
     """
 
-    existing_portfolio = session.query(Portfolio).filter_by(id=portfolio_id).first()
+    existing_portfolio = session.query(
+        Portfolio).filter_by(id=portfolio_id).first()
     existing_portfolio.name = new_portfolio_name
 
     return existing_portfolio
@@ -218,19 +204,6 @@ def get_portfolio_element(portfolio_id: str, p_element_id: str):
     return session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id, id=p_element_id).one()
 
 
-# TODO: not used yet
-@call_database_function
-def get_portfolio_all_elements(portfolio_id: str):
-    """
-    Fetches every PortfolioElement that belongs to a user and portfolio.
-        Parameters:
-            str portfolio_id;
-        Returns:
-            List[PortfolioElement]
-    """
-    return session.query(PortfolioElement).filter_by(portfolio_id=portfolio_id).all()
-
-
 @call_database_function
 def delete_portfolio_element(portfolio_id: str, p_element_id: str):
     """
@@ -241,7 +214,8 @@ def delete_portfolio_element(portfolio_id: str, p_element_id: str):
         Returns:
             Boolean True if the portfolio element was successfully deleted, False otherwise
     """
-    portfolio_element = session.query(PortfolioElement).filter_by(id=p_element_id, portfolio_id=portfolio_id).first()
+    portfolio_element = session.query(PortfolioElement).filter_by(
+        id=p_element_id, portfolio_id=portfolio_id).first()
     if portfolio_element:
         session.delete(portfolio_element)
         return True
@@ -263,7 +237,8 @@ def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float 
         Returns:
             PortfolioElement
     """
-    portfolio_element = session.query(PortfolioElement).filter_by(id=p_element_id, portfolio_id=portfolio_id).one()
+    portfolio_element = session.query(PortfolioElement).filter_by(
+        id=p_element_id, portfolio_id=portfolio_id).one()
 
     # Update count if existent and greater than 0, else delete the element
     if count is not None:
@@ -310,19 +285,6 @@ def add_new_asset(name: str, ticker_symbol: str, isin: str, default_currency: st
         return None
 
 
-# TODO: not used yet
-@call_database_function
-def get_asset_by_name(name: str):
-    """
-    Fetches an asset by name from the database
-        Parameters:
-            str name;
-        Returns:
-            Asset
-    """
-    return session.query(Asset).filter_by(name=name).one()
-
-
 @call_database_function
 def get_asset_by_ticker(ticker: str):
     """
@@ -335,41 +297,6 @@ def get_asset_by_ticker(ticker: str):
     return session.query(Asset).filter_by(ticker_symbol=ticker).first()
 
 
-# TODO: not used yet
-@call_database_function
-def delete_asset(asset_id: str):
-    """
-    Deletes an asset based on the passed id
-        Parameters:
-            str asset_id;
-        Returns:
-            Boolean True if the Asset was successfully deleted, False otherwise
-    """
-    target_asset = session.query(Asset).filter_by(id=asset_id).first()
-    if target_asset:
-        session.delete(target_asset)
-        return True
-    else:
-        return False
-
-
-# TODO: not used yet
-@call_database_function
-def add_new_asset_type(name: str, quote_type: str, unit_type: str):
-    """
-    Creates an asset_type based on the transferred values
-        Parameters:
-            str name;
-            str quote_type;
-            str unit_type;
-        Returns:
-            AssetType
-    """
-    new_asset_type = AssetType(name=name, quote_type=quote_type, unit_type=unit_type)
-    session.add(new_asset_type)
-    return new_asset_type
-
-
 @call_database_function
 def get_asset_type_by_quote_type(quote_type: str):
     """
@@ -380,24 +307,6 @@ def get_asset_type_by_quote_type(quote_type: str):
            AssetType
     """
     return session.query(AssetType).filter_by(quote_type=quote_type).one()
-
-
-# TODO: not used yet
-@call_database_function
-def delete_asset_type(asset_type_id: str):
-    """
-    Deletes an asset_type based on the passed id
-        Parameters:
-            str asset_type_id;
-        Returns:
-            Boolean True if the AssetType was successfully deleted, False otherwise
-    """
-    target_asset_type = session.query(AssetType).filter_by(id=asset_type_id).first()
-    if target_asset_type:
-        session.delete(target_asset_type)
-        return True
-    else:
-        return False
 
 
 @call_database_function

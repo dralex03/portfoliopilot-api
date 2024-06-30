@@ -1,10 +1,9 @@
 import pytest
-
 from flask.testing import FlaskClient
 
 from src import create_app
-from src.database.setup import engine, Session, initialize_default_data
 from src.database.models import Base
+from src.database.setup import Session, engine, initialize_default_data
 
 
 @pytest.fixture(scope='module')
@@ -19,7 +18,7 @@ def setup_session():
     # Check for SQLite for test environment
     if not engine.url.get_backend_name() == 'sqlite':
         raise RuntimeError('Use SQLite Database to run tests')
-    
+
     Base.metadata.create_all(engine)
     initialize_default_data()
     try:

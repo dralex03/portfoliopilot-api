@@ -3,7 +3,7 @@ import yahooquery
 from src.constants.asset_types import QUOTE_TYPE_LIST
 
 
-def search_assets(query: str, country: str|None = None):
+def search_assets(query: str, country: str | None = None):
     """
     Uses yahooquery to find assets for the passed query filtered
     by quote types that are set in the database.
@@ -15,7 +15,8 @@ def search_assets(query: str, country: str|None = None):
     """
 
     # Use yahooquery for the search
-    result = yahooquery.search(query, quotes_count=20, country=country, news_count=0)
+    result = yahooquery.search(
+        query, quotes_count=20, country=country, news_count=0)
 
     if result.get('count') > 0:
         quotes = result.get('quotes')
@@ -32,4 +33,3 @@ def search_assets(query: str, country: str|None = None):
             'count': 0,
             'assets': []
         }
-
