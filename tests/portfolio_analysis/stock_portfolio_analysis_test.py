@@ -52,8 +52,12 @@ def test_get_stock_portfolio_distribution(session: Session):
     order_fee = generate_random_float()
     insert_new_portfolio_element(new_portfolio.id, new_asset.id, count, buy_price, order_fee)
 
-    test_country_weightings, test_sector_weightings, test_trailing_pe = (
-        get_stock_portfolio_distribution(new_portfolio.id))
+    analysis_dict = (
+        get_stock_portfolio_distribution(new_portfolio.id)
+    )
+
+    test_country_weightings = analysis_dict['country_weights']
+    test_sector_weightings = analysis_dict['sector_weights']
 
     assert len(test_country_weightings) == 3
     assert len(test_sector_weightings) == 2
