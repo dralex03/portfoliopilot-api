@@ -12,8 +12,8 @@ def get_etf_info(ticker: str):
     info = Ticker(ticker)
 
     etf_data = {
-        'fund_holding_info': info.fund_holding_info,
-        'fund_profile': info.fund_profile
+        'fund_holding_info': info.fund_holding_info[ticker],
+        'fund_profile': info.fund_profile[ticker]
     }
 
     return etf_data

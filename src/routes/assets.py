@@ -42,7 +42,14 @@ def get_search_assets():
     else:
         country = None
 
-    return generate_success_response(search_assets(query, country))
+    try:
+        results = search_assets(query, country)
+    except Exception as e: # pragma: no cover
+        return generate_internal_error_response(
+            ApiErrors.Assets.search_error, e
+        )
+
+    return generate_success_response(results)
 
 
 @assets.route('/ticker/<ticker>', methods=['GET'])
@@ -58,7 +65,12 @@ def ticker_info(ticker: str):
                 int: the response status code
     """
     
-    asset_info = get_general_info(ticker)
+    try:
+        asset_info = get_general_info(ticker)
+    except Exception as e: # pragma: no cover
+        return generate_internal_error_response(
+            ApiErrors.Assets.ticker_get_info_error, e
+        )
 
     # Check if asset with this ticker exists
     if asset_info is None:
@@ -66,7 +78,12 @@ def ticker_info(ticker: str):
     
     # Add extra data for ETFs
     if asset_info.get('quoteType') == 'ETF':
-        asset_info['etfData'] = get_etf_info(ticker)
+        try:
+            asset_info['etfData'] = get_etf_info(ticker)
+        except Exception as e: # pragma: no cover
+            return generate_internal_error_response(
+                ApiErrors.Assets.ticker_get_info_error, e
+            )
 
     return generate_success_response(asset_info)
 
@@ -91,11 +108,11 @@ def ticker_price_data(ticker: str):
     if not isinstance(period, str) or len(period) <= 0:
         return generate_bad_request_response(
             ApiErrors.missing_query_param('period')
-            )
+        )
     if not isinstance(interval, str) or len(interval) <= 0:
         return generate_bad_request_response(
             ApiErrors.missing_query_param('interval')
-            )
+        )
     
     period = period.lower()
     interval = interval.lower()
@@ -104,11 +121,11 @@ def ticker_price_data(ticker: str):
     if period not in VALID_PERIODS:
         return generate_bad_request_response(
             ApiErrors.invalid_query_param('period')
-            )
+        )
     if interval not in VALID_INTERVALS:
         return generate_bad_request_response(
             ApiErrors.invalid_query_param('interval')
-            )
+        )
     
     try:
         price_data = get_price_data(ticker, period, interval)
@@ -117,7 +134,7 @@ def ticker_price_data(ticker: str):
     except Exception as e: # pragma: no cover
         return generate_internal_error_response(
             ApiErrors.Assets.ticker_price_data_error, e
-            )
+        )
 
     # Check if asset with this ticker exists
     if price_data is None:
