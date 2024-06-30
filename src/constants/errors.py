@@ -117,6 +117,7 @@ class ApiErrors:
         update_portfolio_element_error = 'Error updating portfolio element.'
         get_asset_by_ticker_error = 'Error finding asset.'
         get_asset_type_by_quote_type_error = 'Error finding asset type.'
+        get_portfolio_analysis = 'Error fetching portfolio analysis.'
 
         # Input Errors
         portfolio_already_exists = 'Portfolio with this name already exists.'
