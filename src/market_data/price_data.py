@@ -6,6 +6,7 @@ valid_intervals = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d
 
 def get_price_data(ticker: str, period: str, interval: str):
     """
+    Fetches price data of a given ticker over a specified period and interval
     Args:
         str ticker
         str period
@@ -26,3 +27,26 @@ def get_price_data(ticker: str, period: str, interval: str):
 
     json_price_data = df.to_json(orient='records', date_format='iso')
     return json_price_data
+
+
+def get_current_price(ticker_symbol: str):
+    """
+    Fetches the most recent price of a given ticker symbol.
+    Args:
+        str ticker_symbol
+
+    Returns:
+        JSON price_data
+    """
+
+    ticker = yf.Ticker(ticker_symbol)
+
+    recent_data = ticker.history(period='1d')
+
+    most_recent_price = recent_data['Close'].iloc[-1]
+
+    price_info = {"price": most_recent_price}
+
+    return price_info
+
+
