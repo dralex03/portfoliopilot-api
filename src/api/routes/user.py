@@ -3,12 +3,12 @@ from flask import Blueprint, request, make_response, jsonify
 
 from src.database import queries
 from src.database.models import User
-from src.utils.input_validation import is_valid_email, is_strong_password
+from src.api.utils.input_validation import is_valid_email, is_strong_password
 from src.constants import http_status_codes as status
-from src.utils.decorators import jwt_required
-from src.utils.responses import *
-from src.utils.request_parser import *
-from src.routes.user_portfolios import user_portfolios
+from src.api.utils.decorators import jwt_required
+from src.api.utils.responses import *
+from src.api.utils.request_parser import *
+from src.api.routes.user_portfolios import user_portfolios
 from src.constants.errors import ApiErrors
 from src.constants.messages import ApiMessages
 

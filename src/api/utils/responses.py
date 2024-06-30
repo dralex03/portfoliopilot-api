@@ -2,7 +2,7 @@ from typing import Dict, Any, List
 
 from flask import make_response, jsonify
 
-from src.utils import jwt_auth
+from src.api.utils import jwt_auth
 from src.constants import http_status_codes as status
 
 

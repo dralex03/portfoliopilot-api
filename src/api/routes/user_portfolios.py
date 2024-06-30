@@ -2,9 +2,9 @@ from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
 
 from src.database import queries, models
-from src.utils.decorators import jwt_required, validate_portfolio_owner
-from src.utils.responses import *
-from src.utils.request_parser import parse_json_request_body
+from src.api.utils.decorators import jwt_required, validate_portfolio_owner
+from src.api.utils.responses import *
+from src.api.utils.request_parser import parse_json_request_body
 from src.constants.errors import ApiErrors
 from src.constants.messages import ApiMessages
 from src.market_data.general_data import get_general_info

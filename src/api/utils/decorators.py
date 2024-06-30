@@ -6,8 +6,8 @@ from flask import request, make_response, jsonify
 from sqlalchemy.exc import NoResultFound
 
 from src.constants.http_status_codes import HTTP_401_UNAUTHORIZED
-from src.utils.jwt_auth import decode_auth_token
-from src.utils.responses import *
+from src.api.utils.jwt_auth import decode_auth_token
+from src.api.utils.responses import *
 from src.database import queries, models
 from src.constants.errors import ApiErrors
 
