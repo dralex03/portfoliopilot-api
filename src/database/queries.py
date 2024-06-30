@@ -40,7 +40,6 @@ def get_user_by_email(email: str):
     return session.query(User).filter_by(email=email).first()
 
 
-
 @call_database_function
 def get_user_by_id(id: str):
     """
@@ -51,7 +50,6 @@ def get_user_by_id(id: str):
             User
     """
     return session.query(User).filter_by(id=id).one()
-
 
 
 @call_database_function
@@ -274,7 +272,7 @@ def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float 
         else:
             session.delete(portfolio_element)
             return 'deleted'
-    
+
     # Update buy price if existent
     if buy_price is not None and buy_price > 0:
         portfolio_element.buy_price = buy_price
@@ -400,3 +398,24 @@ def delete_asset_type(asset_type_id: str):
         return True
     else:
         return False
+
+
+@call_database_function
+def get_ticker_symbols_of_portfolio(portfolio_id: int):
+    """
+    Fetches the ticker symbols associated with a specific portfolio
+        Parameters:
+            int portfolio_id
+        Returns:
+            List of tickers
+    """
+
+    tickers = [
+        ticker_symbol for (ticker_symbol,) in (
+            session.query(Asset.ticker_symbol)
+            .join(PortfolioElement, PortfolioElement.asset_id == Asset.id)
+            .filter(PortfolioElement.portfolio_id == portfolio_id)
+            .all()
+        )
+    ]
+    return tickers

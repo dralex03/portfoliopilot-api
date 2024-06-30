@@ -21,18 +21,20 @@ def get_stock_info(ticker: str):
     return info
 
 
-# TODO: not used yet
 def get_stock_classification(ticker: str):
     """
-    Returns the country, sector and pe of a given stock ticker or None if this information is not available.
+    Returns the country, sector and pe of a given stock ticker or None if this information is not available
         Parameters:
-            str ticker;
+            str ticker
         Returns:
-            Tuple: country, sector and trailingPE if Data is available 
-            else None
+            JSON country, sector and trailingPE if Data is available
     """
-
     stock = yf.Ticker(ticker)
     if stock:
-        return stock.info.get('country'), stock.info.get('sector'), stock.info.get('trailingPE')
+        info = stock.info
+        ticker_type = info.get('quoteType')
+
+        if ticker_type == 'EQUITY':
+            return info.get('country'), info.get('sector'), info.get('trailingPE')
+
     return None
