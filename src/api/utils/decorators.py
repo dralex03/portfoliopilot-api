@@ -1,15 +1,15 @@
+import inspect
 from functools import wraps
 from typing import Callable, List
-import inspect
 
-from flask import request, make_response, jsonify
+from flask import jsonify, make_response, request
 from sqlalchemy.exc import NoResultFound
 
-from src.constants.http_status_codes import HTTP_401_UNAUTHORIZED
 from src.api.utils.jwt_auth import decode_auth_token
 from src.api.utils.responses import *
-from src.database import queries, models
 from src.constants.errors import ApiErrors
+from src.constants.http_status_codes import HTTP_401_UNAUTHORIZED
+from src.database import models, queries
 
 
 def validate_function_params(func: Callable, required_params: List[str]):
@@ -28,7 +28,8 @@ def validate_function_params(func: Callable, required_params: List[str]):
 
     missing_params = [p for p in required_params if p not in func_params]
     if missing_params:
-        raise TypeError(f"Function '{func.__name__}' missing required parameters: {missing_params}")
+        raise TypeError(f"Function '{func.__name__}' missing required parameters: {
+                        missing_params}")
 
 
 def jwt_required(func: Callable):
@@ -50,7 +51,7 @@ def jwt_required(func: Callable):
 
         # Get Auth header from the request object
         auth_header = request.headers.get('Authorization')
-    
+
         # Check if auth_header is in correct format and extract the JWT
         if auth_header and auth_header.startswith('Bearer '):
             auth_token = auth_header.split(' ')[1]
@@ -60,14 +61,14 @@ def jwt_required(func: Callable):
         if auth_token:
             # Decode the JWT
             is_valid, uid_or_message = decode_auth_token(auth_token)
-            
+
             if is_valid:
                 user = None
 
                 # If the token is valid, make sure the user exists
                 try:
                     user = queries.get_user_by_id(uid_or_message)
-                except NoResultFound as e: # User ID was not found
+                except NoResultFound as e:  # User ID was not found
                     pass
                 except Exception as e:
                     return generate_internal_error_response(ApiErrors.User.get_user_by_id_error, e)
@@ -92,7 +93,7 @@ def jwt_required(func: Callable):
             }
 
         return make_response(jsonify(response_object)), HTTP_401_UNAUTHORIZED
-        
+
     return decorator
 
 
@@ -122,10 +123,11 @@ def validate_portfolio_owner(func: Callable):
 
         # Fetch portfolio by portfolio ID
         try:
-            portfolio: models.Portfolio = queries.get_portfolio_by_id(portfolio_id)
+            portfolio: models.Portfolio = queries.get_portfolio_by_id(
+                portfolio_id)
         except Exception as e:
             return generate_internal_error_response(ApiErrors.Portfolio.get_portfolio_by_id_error, e)
-        
+
         # Check whether the user owns this portfolio or not
         if portfolio is not None and str(portfolio.user_id) == user_id:
             return func(user_id=user_id, portfolio=portfolio, *args, **kwargs)
@@ -133,5 +135,5 @@ def validate_portfolio_owner(func: Callable):
             # For security reasons, return 404
             message = ApiErrors.data_by_id_not_found('portfolio', portfolio_id)
             return generate_not_found_response(message)
-        
+
     return decorator

@@ -1,5 +1,4 @@
 import pytest
-
 from flask.testing import FlaskClient
 
 from src.constants.errors import ApiErrors
@@ -24,6 +23,7 @@ def get_all_post_urls_with_json():
         # ('PUT', '/user/portfolios/<portfolio_id>', True) # TODO
     ]
 
+
 @pytest.mark.parametrize('method,path,login', get_all_post_urls_with_json())
 def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: bool):
     """
@@ -40,8 +40,9 @@ def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: b
 
     auth_token = None
     if login:
-        auth_token = login_user(test_client, 'john.doe@example.com', 'Password123!')
-    
+        auth_token = login_user(
+            test_client, 'john.doe@example.com', 'Password123!')
+
     # Test invalid JSON body
     if method == 'POST':
         response = test_client.post(path,
@@ -50,7 +51,7 @@ def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: b
                                     headers={
                                         'Authorization': 'Bearer ' + auth_token
                                     } if auth_token else None
-                                )
+                                    )
 
     elif method == 'PUT':
         response = test_client.put(path,
@@ -59,7 +60,7 @@ def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: b
                                    headers={
                                        'Authorization': 'Bearer ' + auth_token
                                    } if auth_token else None
-                                )
+                                   )
 
     assert response.status_code == 500
     assert response.is_json
@@ -67,7 +68,6 @@ def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: b
     assert not response.json['success']
 
     assert response.json['message'] == ApiErrors.invalid_json
-
 
     # Test invalid content type
     if method == 'POST':
@@ -77,7 +77,7 @@ def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: b
                                     headers={
                                         'Authorization': 'Bearer ' + auth_token
                                     } if auth_token else None
-                                )
+                                    )
 
     elif method == 'PUT':
         response = test_client.put(path,
@@ -86,7 +86,7 @@ def test_json_parsing(test_client: FlaskClient, method: str, path: str, login: b
                                    headers={
                                        'Authorization': 'Bearer ' + auth_token
                                    } if auth_token else None
-                                )
+                                   )
 
     assert response.status_code == 400
     assert response.is_json

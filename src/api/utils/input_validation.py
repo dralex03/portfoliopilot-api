@@ -1,5 +1,7 @@
 import re
+
 from src import config
+
 
 def is_valid_email(email: str):
     """

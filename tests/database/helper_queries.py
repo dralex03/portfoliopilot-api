@@ -1,5 +1,5 @@
-import string
 import random
+import string
 
 from src.database.queries import *
 
@@ -101,7 +101,8 @@ def insert_new_asset(name: str, ticker_symbol: str, isin: str, default_currency:
 
 
 def insert_new_asset_type(name: str, quote_type: str, unit_type: str):
-    new_asset_type = AssetType(name=name, quote_type=quote_type, unit_type=unit_type)
+    new_asset_type = AssetType(
+        name=name, quote_type=quote_type, unit_type=unit_type)
     session.add(new_asset_type)
     session.commit()
     return new_asset_type

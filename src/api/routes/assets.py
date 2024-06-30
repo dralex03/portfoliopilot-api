@@ -1,15 +1,15 @@
 from flask import Blueprint, request
-from yfinance.exceptions import YFChartError
 from yahooquery.utils.countries import COUNTRIES
+from yfinance.exceptions import YFChartError
 
-from src.api.utils.responses import *
 from src.api.utils.request_parser import *
+from src.api.utils.responses import *
 from src.constants.errors import ApiErrors
-from src.market_data.search import search_assets
-from src.market_data.general_data import get_general_info
-from src.market_data.price_data import get_price_data, get_current_price, VALID_INTERVALS, VALID_PERIODS
 from src.market_data.etf_data import get_etf_info
-
+from src.market_data.general_data import get_general_info
+from src.market_data.price_data import (VALID_INTERVALS, VALID_PERIODS,
+                                        get_current_price, get_price_data)
+from src.market_data.search import search_assets
 
 # Create blueprint which is used in the flask app
 assets = Blueprint('assets', __name__)
@@ -33,7 +33,7 @@ def get_search_assets():
     # "query" is a required parameter
     if not isinstance(query, str) or len(query) <= 0:
         return generate_bad_request_response(ApiErrors.missing_query_param('query'))
-    
+
     # "country" is optional, but needs to be valid
     # if its not valid, we default it to None
     if isinstance(country, str) and len(country) > 0:
@@ -44,7 +44,7 @@ def get_search_assets():
 
     try:
         results = search_assets(query, country)
-    except Exception as e: # pragma: no cover
+    except Exception as e:  # pragma: no cover
         return generate_internal_error_response(
             ApiErrors.Assets.search_error, e
         )
@@ -64,10 +64,10 @@ def ticker_info(ticker: str):
                 Response: Flask Response, contains the response_object dict
                 int: the response status code
     """
-    
+
     try:
         asset_info = get_general_info(ticker)
-    except Exception as e: # pragma: no cover
+    except Exception as e:  # pragma: no cover
         return generate_internal_error_response(
             ApiErrors.Assets.ticker_get_info_error, e
         )
@@ -75,12 +75,12 @@ def ticker_info(ticker: str):
     # Check if asset with this ticker exists
     if asset_info is None:
         return generate_not_found_response(ApiErrors.Assets.ticker_not_found)
-    
+
     # Add extra data for ETFs
     if asset_info.get('quoteType') == 'ETF':
         try:
             asset_info['etfData'] = get_etf_info(ticker)
-        except Exception as e: # pragma: no cover
+        except Exception as e:  # pragma: no cover
             return generate_internal_error_response(
                 ApiErrors.Assets.ticker_get_info_error, e
             )
@@ -100,7 +100,7 @@ def ticker_price_data(ticker: str):
                 Response: Flask Response, contains the response_object dict
                 int: the response status code
     """
-    
+
     period = request.args.get('period')
     interval = request.args.get('interval')
 
@@ -113,10 +113,10 @@ def ticker_price_data(ticker: str):
         return generate_bad_request_response(
             ApiErrors.missing_query_param('interval')
         )
-    
+
     period = period.lower()
     interval = interval.lower()
-    
+
     # Validating period and interval for valid values
     if period not in VALID_PERIODS:
         return generate_bad_request_response(
@@ -126,12 +126,12 @@ def ticker_price_data(ticker: str):
         return generate_bad_request_response(
             ApiErrors.invalid_query_param('interval')
         )
-    
+
     try:
         price_data = get_price_data(ticker, period, interval)
-    except YFChartError as e: # invalid interval for requested period
+    except YFChartError as e:  # invalid interval for requested period
         return generate_bad_request_response(str(e))
-    except Exception as e: # pragma: no cover
+    except Exception as e:  # pragma: no cover
         return generate_internal_error_response(
             ApiErrors.Assets.ticker_price_data_error, e
         )

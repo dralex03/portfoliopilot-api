@@ -3,7 +3,6 @@ from multiprocessing import Process, Queue
 import yfinance as yf
 
 
-
 def get_isin(ticker: str, queue: Queue):
     """
     Helper function that fetches ISIN from the ticker object
@@ -34,9 +33,9 @@ def get_general_info(ticker: str):
 
     if ticker_obj.info.get('symbol') is None:
         return None
-    
+
     ticker_info = ticker_obj.info
-    
+
     # Use multiprocessing for custom 5sec timeout as default timeout
     # from yfinance is 30sec.
     queue = Queue()

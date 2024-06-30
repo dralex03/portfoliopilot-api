@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.database.models import Base, AssetType
+
 from src.config import DATABASE_URL
 from src.constants.asset_types import ASSET_TYPES
+from src.database.models import AssetType, Base
 
 #  Creates a base class for all ORM models
 engine = create_engine(DATABASE_URL)
@@ -36,11 +37,13 @@ def initialize_default_data():
             quote_type = asset_type.get('quoteType')
             unit_type = asset_type.get('unitType')
 
-            existing_asset_type = session.query(AssetType).filter_by(name=name).first()
+            existing_asset_type = session.query(
+                AssetType).filter_by(name=name).first()
 
             # Add asset type if not existent yet
             if existing_asset_type is None:
-                new_asset_type = AssetType(name=name, quote_type=quote_type, unit_type=unit_type)
+                new_asset_type = AssetType(
+                    name=name, quote_type=quote_type, unit_type=unit_type)
                 session.add(new_asset_type)
 
         session.commit()

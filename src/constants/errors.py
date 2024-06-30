@@ -37,11 +37,11 @@ class ApiErrors:
     @staticmethod
     def field_wrong_type(field_name: str, type: str) -> str:
         return f'Field "{field_name}" needs to be a {type}.'
-    
+
     @staticmethod
     def field_is_empty(field_name: str) -> str:
         return f'Field "{field_name}" can not be empty.'
-    
+
     @staticmethod
     def num_field_out_of_limit(field_name: str, limit: str, scope: str) -> str:
         match scope:
@@ -53,16 +53,14 @@ class ApiErrors:
                 return f'Field "{field_name}" needs to be equal to or less than {limit}.'
             case '<':
                 return f'Field "{field_name}" needs to be less than {limit}.'
-            
 
     @staticmethod
     def missing_query_param(param: str) -> str:
         return f'Missing required query parameter "{param}".'
-    
+
     @staticmethod
     def invalid_query_param(param: str) -> str:
         return f'Invalid value for query parameter "{param}".'
-            
 
     @staticmethod
     def delete_data_by_id_error(data_type: str, data_id: str) -> str:
@@ -71,7 +69,6 @@ class ApiErrors:
     @staticmethod
     def data_by_id_not_found(data_type: str, data_id: str) -> str:
         return f'{data_type.capitalize()} with ID "{data_id}" not found.'
-
 
     class User:
         """
@@ -101,7 +98,6 @@ class ApiErrors:
         jwt_token_expired = 'Signature expired. Please log in again.'
         jwt_token_invalid = 'Invalid token. Please log in.'
 
-
     class Portfolio:
         """
         This class contains all error messages for /user/portfolio/...
@@ -124,7 +120,6 @@ class ApiErrors:
         update_p_element_all_values_none = 'Please enter at least one value to change.'
         portfolio_element_asset_invalid_type = 'The quote type for this asset is not supported.'
         portfolio_element_asset_invalid_ticker = 'No Asset was found for this ticker.'
-
 
     class Assets:
         """

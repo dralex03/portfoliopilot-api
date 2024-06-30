@@ -1,11 +1,9 @@
 import pytest
-
 from sqlalchemy.orm.session import Session
 
 from src.portfolio_analysis.stock_analysis import *
-
-from tests.database.helper_queries import *
 from tests.database.conftest import session
+from tests.database.helper_queries import *
 
 
 def test_get_stock_portfolio_distribution(session: Session):
@@ -19,12 +17,14 @@ def test_get_stock_portfolio_distribution(session: Session):
     isin = generate_random_string()
     default_currency = generate_random_string()
 
-    new_asset = insert_new_asset(name, ticker_symbol, isin, default_currency, new_asset_type.id)
+    new_asset = insert_new_asset(
+        name, ticker_symbol, isin, default_currency, new_asset_type.id)
 
     count = generate_random_float()
     buy_price = generate_random_float()
     order_fee = generate_random_float()
-    insert_new_portfolio_element(new_portfolio.id, new_asset.id, count, buy_price, order_fee)
+    insert_new_portfolio_element(
+        new_portfolio.id, new_asset.id, count, buy_price, order_fee)
 
     #  Technology / Germany
     name = 'SAP'
@@ -32,12 +32,14 @@ def test_get_stock_portfolio_distribution(session: Session):
     isin = generate_random_string()
     default_currency = generate_random_string()
 
-    new_asset = insert_new_asset(name, ticker_symbol, isin, default_currency, new_asset_type.id)
+    new_asset = insert_new_asset(
+        name, ticker_symbol, isin, default_currency, new_asset_type.id)
 
     count = generate_random_float()
     buy_price = generate_random_float()
     order_fee = generate_random_float()
-    insert_new_portfolio_element(new_portfolio.id, new_asset.id, count, buy_price, order_fee)
+    insert_new_portfolio_element(
+        new_portfolio.id, new_asset.id, count, buy_price, order_fee)
 
     #  Consumer Cyclical / China
     name = 'Alibaba'
@@ -45,12 +47,14 @@ def test_get_stock_portfolio_distribution(session: Session):
     isin = generate_random_string()
     default_currency = generate_random_string()
 
-    new_asset = insert_new_asset(name, ticker_symbol, isin, default_currency, new_asset_type.id)
+    new_asset = insert_new_asset(
+        name, ticker_symbol, isin, default_currency, new_asset_type.id)
 
     count = generate_random_float()
     buy_price = generate_random_float()
     order_fee = generate_random_float()
-    insert_new_portfolio_element(new_portfolio.id, new_asset.id, count, buy_price, order_fee)
+    insert_new_portfolio_element(
+        new_portfolio.id, new_asset.id, count, buy_price, order_fee)
 
     analysis_dict = (
         get_stock_portfolio_distribution(new_portfolio.id)

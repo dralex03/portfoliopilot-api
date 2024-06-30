@@ -1,12 +1,12 @@
 import uuid
 
-from sqlalchemy import Column, String, Float, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy import Column, Float, ForeignKey, String, UniqueConstraint
+from sqlalchemy.orm import declarative_base, relationship
 
 from src.database.uuid_type import UUID
 
-
 Base = declarative_base()
+
 
 class Model(Base):
     """
@@ -29,10 +29,10 @@ class Model(Base):
                 dict: The object in dictionary format.
         """
         relationships = self.__mapper__.relationships.keys()
-        
+
         if len(self._json_values) == 0:
             self._json_values = self.__table__.columns.keys()
-        
+
         json_data = {}
 
         for key in self._json_values:
@@ -70,8 +70,10 @@ class Portfolio(Model):
     name = Column(String, nullable=False)
     user_id = Column(UUID(), ForeignKey('users.id'))
     owner = relationship('User', back_populates='portfolios')
-    elements = relationship('PortfolioElement', back_populates='portfolio', cascade='all, delete-orphan')
-    __table_args__ = (UniqueConstraint('name', 'user_id', name='portfolio_name_id_uc'),)
+    elements = relationship(
+        'PortfolioElement', back_populates='portfolio', cascade='all, delete-orphan')
+    __table_args__ = (UniqueConstraint(
+        'name', 'user_id', name='portfolio_name_id_uc'),)
 
     _json_values = ['id', 'name', 'elements']
 
@@ -87,7 +89,8 @@ class PortfolioElement(Model):
     asset_id = Column(UUID(), ForeignKey('assets.id'))
     asset = relationship('Asset', back_populates='portfolio_elements')
 
-    _json_values = ['id', 'count', 'buy_price', 'order_fee', 'portfolio_id', 'asset']
+    _json_values = ['id', 'count', 'buy_price',
+                    'order_fee', 'portfolio_id', 'asset']
 
 
 class Asset(Model):
@@ -99,9 +102,11 @@ class Asset(Model):
     default_currency = Column(String, nullable=True)
     asset_type_id = Column(UUID(), ForeignKey('asset_types.id'))
     asset_type = relationship('AssetType', back_populates='assets')
-    portfolio_elements = relationship('PortfolioElement', back_populates='asset')
+    portfolio_elements = relationship(
+        'PortfolioElement', back_populates='asset')
 
-    _json_values = ['id', 'name', 'ticker_symbol', 'isin', 'default_currency', 'asset_type']
+    _json_values = ['id', 'name', 'ticker_symbol',
+                    'isin', 'default_currency', 'asset_type']
 
 
 class AssetType(Model):

@@ -1,7 +1,9 @@
 from functools import wraps
-from src.database.models import Portfolio, PortfolioElement, User, Asset, AssetType
-from src.database.setup import session
 from typing import Callable
+
+from src.database.models import (Asset, AssetType, Portfolio, PortfolioElement,
+                                 User)
+from src.database.setup import session
 
 
 def call_database_function(function: Callable):
@@ -148,7 +150,8 @@ def delete_portfolio_by_id(portfolio_id: str):
         Returns:
             Boolean True if the Portfolio was successfully deleted, False otherwise
     """
-    portfolio_to_delete = session.query(Portfolio).filter_by(id=portfolio_id).first()
+    portfolio_to_delete = session.query(
+        Portfolio).filter_by(id=portfolio_id).first()
     if portfolio_to_delete:
         session.delete(portfolio_to_delete)
         return True
@@ -167,7 +170,8 @@ def update_portfolio_name(portfolio_id: str, new_portfolio_name: str):
             Portfolio
     """
 
-    existing_portfolio = session.query(Portfolio).filter_by(id=portfolio_id).first()
+    existing_portfolio = session.query(
+        Portfolio).filter_by(id=portfolio_id).first()
     existing_portfolio.name = new_portfolio_name
 
     return existing_portfolio
@@ -241,7 +245,8 @@ def delete_portfolio_element(portfolio_id: str, p_element_id: str):
         Returns:
             Boolean True if the portfolio element was successfully deleted, False otherwise
     """
-    portfolio_element = session.query(PortfolioElement).filter_by(id=p_element_id, portfolio_id=portfolio_id).first()
+    portfolio_element = session.query(PortfolioElement).filter_by(
+        id=p_element_id, portfolio_id=portfolio_id).first()
     if portfolio_element:
         session.delete(portfolio_element)
         return True
@@ -263,7 +268,8 @@ def update_portfolio_element(portfolio_id: str, p_element_id: str, count: float 
         Returns:
             PortfolioElement
     """
-    portfolio_element = session.query(PortfolioElement).filter_by(id=p_element_id, portfolio_id=portfolio_id).one()
+    portfolio_element = session.query(PortfolioElement).filter_by(
+        id=p_element_id, portfolio_id=portfolio_id).one()
 
     # Update count if existent and greater than 0, else delete the element
     if count is not None:
@@ -365,7 +371,8 @@ def add_new_asset_type(name: str, quote_type: str, unit_type: str):
         Returns:
             AssetType
     """
-    new_asset_type = AssetType(name=name, quote_type=quote_type, unit_type=unit_type)
+    new_asset_type = AssetType(
+        name=name, quote_type=quote_type, unit_type=unit_type)
     session.add(new_asset_type)
     return new_asset_type
 
@@ -392,7 +399,8 @@ def delete_asset_type(asset_type_id: str):
         Returns:
             Boolean True if the AssetType was successfully deleted, False otherwise
     """
-    target_asset_type = session.query(AssetType).filter_by(id=asset_type_id).first()
+    target_asset_type = session.query(
+        AssetType).filter_by(id=asset_type_id).first()
     if target_asset_type:
         session.delete(target_asset_type)
         return True
