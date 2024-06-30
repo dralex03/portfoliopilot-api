@@ -131,6 +131,8 @@ class ApiErrors:
         """
 
         # Internal errors
+        search_error = 'Error executing search.'
+        ticker_get_info_error = 'Error getting ticker info.'
         ticker_price_data_error = 'Unexpected error occurred while fetching price data.'
 
         # Input Errors
