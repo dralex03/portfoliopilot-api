@@ -421,7 +421,7 @@ def get_ticker_symbols_of_portfolio(portfolio_id: int):
     """
     Fetches the ticker symbols associated with a specific portfolio
     Args:
-        str portfolio_id
+        int portfolio_id
 
     Returns:
         List of tickers
