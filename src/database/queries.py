@@ -401,31 +401,13 @@ def delete_asset_type(asset_type_id: str):
 
 
 @call_database_function
-def delete_asset_type(asset_type_id: str):
-    """
-    Deletes an asset_type based on the passed id
-        Parameters:
-            str asset_type_id;
-        Returns:
-            Boolean True if the AssetType was successfully deleted, False otherwise
-    """
-    target_asset_type = session.query(AssetType).filter_by(id=asset_type_id).first()
-    if target_asset_type:
-        session.delete(target_asset_type)
-        return True
-    else:
-        return False
-
-
-@call_database_function
 def get_ticker_symbols_of_portfolio(portfolio_id: int):
     """
     Fetches the ticker symbols associated with a specific portfolio
-    Args:
-        int portfolio_id
-
-    Returns:
-        List of tickers
+        Parameters:
+            int portfolio_id
+        Returns:
+            List of tickers
     """
 
     tickers = [

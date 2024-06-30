@@ -433,12 +433,12 @@ def update_element_of_user_portfolio(user_id: str, portfolio: models.Portfolio, 
     return generate_success_response(portfolio_element.to_json())
 
 
-@user_portfolios.route('analysis/<portfolio_id>', methods=['GET'])
+@user_portfolios.route('/<portfolio_id>/analysis', methods=['GET'])
 @jwt_required
 @validate_portfolio_owner
-def get_stock_portfolio_analysis(portfolio: models.Portfolio):
+def get_stock_portfolio_analysis(user_id: str, portfolio: models.Portfolio):
     """
-    Handles GET requests to /user/portfolios/analysis/<portfolio_id> where <portfolio_id> is the ID of a users portfolio.
+    Handles GET requests to /user/portfolios/<portfolio_id>/analysis where <portfolio_id> is the ID of a users portfolio.
     Returns the the distribution of Stocks in that portfolio
         Parameters:
             Portfolio portfolio;
@@ -446,6 +446,8 @@ def get_stock_portfolio_analysis(portfolio: models.Portfolio):
             JSON
     """
     try:
-        return get_stock_portfolio_distribution(portfolio.id)
+        analysis = get_stock_portfolio_distribution(portfolio.id)
     except Exception as e:  # pragma: no cover
-        return generate_internal_error_response(ApiErrors.Portfolio.get_portfolio_analysis, e)
+        return generate_internal_error_response(ApiErrors.Portfolio.get_portfolio_analysis_error, e)
+    
+    return generate_success_response(analysis)

@@ -36,14 +36,16 @@ def get_price_data(ticker: str, period: str, interval: str):
 def get_current_price(ticker_symbol: str):
     """
     Fetches the most recent price of a given ticker symbol.
-    Args:
-        str ticker_symbol
-
-    Returns:
-        JSON price_data
+        Parameters:
+            str ticker_symbol
+        Returns:
+            JSON price_data
     """
 
     ticker = yf.Ticker(ticker_symbol)
+
+    if ticker.info.get('symbol') is None:
+        return None
 
     recent_data = ticker.history(period='1d')
 
