@@ -17,10 +17,7 @@ def get_all_post_urls_with_json():
     return [
         ('POST', '/user/login', False),
         ('POST', '/user/register', False),
-        # ('POST', '/user/portfolios/<portfolio_id>/add', True), # TODO
-        ('POST', '/user/portfolios/create', True),
-        # ('PUT', '/user/portfolios/<portfolio_id>/<p_element_id>', True), # TODO
-        # ('PUT', '/user/portfolios/<portfolio_id>', True) # TODO
+        ('POST', '/user/portfolios/create', True)
     ]
 
 

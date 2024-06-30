@@ -3,7 +3,13 @@ from sqlalchemy.orm.session import Session
 
 from src.portfolio_analysis.stock_analysis import *
 from tests.database.conftest import session
-from tests.database.helper_queries import *
+from tests.database.helper_queries import (generate_new_asset_type,
+                                           generate_new_portfolio,
+                                           generate_new_user,
+                                           generate_random_float,
+                                           generate_random_string,
+                                           insert_new_asset,
+                                           insert_new_portfolio_element)
 
 
 def test_get_stock_portfolio_distribution(session: Session):

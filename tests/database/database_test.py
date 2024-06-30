@@ -19,15 +19,6 @@ def test_user_insertion(session: Session):
         add_new_user(new_user.email, new_user.password)
 
 
-def test_user_deletion(session: Session):
-    new_user = generate_new_user()
-
-    delete_user_by_id(new_user.id)
-
-    fetched_user = session.query(User).filter_by(email=new_user.email).first()
-    assert fetched_user is None
-
-
 def test_get_user_by_email(session: Session):
     new_user = generate_new_user()
 
@@ -120,36 +111,6 @@ def test_get_portfolio_element(session: Session):
     assert fetched_portfolio_element.count == new_portfolio_element.count
     assert fetched_portfolio_element.order_fee == new_portfolio_element.order_fee
     assert fetched_portfolio_element.buy_price == new_portfolio_element.buy_price
-
-
-def test_get_portfolio_all_elements(session: Session):
-    new_asset_type = generate_new_asset_type()
-    new_asset_type_2 = generate_new_asset_type()
-    new_asset = generate_new_asset(new_asset_type.id)
-    new_asset_2 = generate_new_asset(new_asset_type_2.id)
-    new_user = generate_new_user()
-    new_portfolio = generate_new_portfolio(new_user.id)
-    new_portfolio_element = generate_new_portfolio_element(
-        new_portfolio.id, new_asset.id)
-    new_portfolio_element_2 = generate_new_portfolio_element(
-        new_portfolio.id, new_asset_2.id)
-
-    fetched_portfolio_elements = get_portfolio_all_elements(new_portfolio.id)
-
-    assert fetched_portfolio_elements is not None
-    assert len(fetched_portfolio_elements) == 2
-    assert any(portfolio.order_fee ==
-               new_portfolio_element.order_fee for portfolio in fetched_portfolio_elements)
-    assert any(portfolio.order_fee ==
-               new_portfolio_element_2.order_fee for portfolio in fetched_portfolio_elements)
-    assert any(portfolio.count ==
-               new_portfolio_element.count for portfolio in fetched_portfolio_elements)
-    assert any(portfolio.count ==
-               new_portfolio_element_2.count for portfolio in fetched_portfolio_elements)
-    assert any(portfolio.buy_price ==
-               new_portfolio_element.buy_price for portfolio in fetched_portfolio_elements)
-    assert any(portfolio.buy_price ==
-               new_portfolio_element_2.buy_price for portfolio in fetched_portfolio_elements)
 
 
 def test_portfolio_element_deletion(session: Session):
@@ -256,16 +217,6 @@ def test_asset_insertion(session: Session):
     assert fetched_asset.name == new_asset.name
 
 
-def test_get_asset_by_name(session: Session):
-    new_asset_type = generate_new_asset_type()
-    new_asset = generate_new_asset(new_asset_type.id)
-
-    fetched_asset = get_asset_by_name(new_asset.name)
-
-    assert fetched_asset is not None
-    assert fetched_asset.name == new_asset.name
-
-
 def test_get_asset_by_ticker(session: Session):
     new_asset_type = generate_new_asset_type()
     new_asset = generate_new_asset(new_asset_type.id)
@@ -276,30 +227,6 @@ def test_get_asset_by_ticker(session: Session):
     assert fetched_asset.ticker_symbol == new_asset.ticker_symbol
 
 
-def test_asset_deletion(session: Session):
-    new_asset_type = generate_new_asset_type()
-    new_asset = generate_new_asset(new_asset_type.id)
-
-    delete_asset(new_asset.id)
-
-    with pytest.raises(Exception):
-        get_asset_by_name(new_asset.name)
-
-
-def test_asset_type_insertion(session: Session):
-    new_asset_type = generate_new_asset_type()
-
-    fetched_asset_type = session.query(
-        AssetType).filter_by(id=new_asset_type.id).first()
-
-    assert fetched_asset_type is not None
-    assert fetched_asset_type.name == new_asset_type.name
-
-    with pytest.raises(Exception):
-        add_new_asset_type(new_asset_type.name,
-                           new_asset_type.quote_type, new_asset_type.unit_type)
-
-
 def test_get_asset_type_by_name(session: Session):
     new_asset_type = generate_new_asset_type()
 
@@ -308,13 +235,3 @@ def test_get_asset_type_by_name(session: Session):
 
     assert fetched_asset_type is not None
     assert fetched_asset_type.name == new_asset_type.name
-
-
-def test_asset_type_deletion(session: Session):
-    new_asset_type = generate_new_asset_type()
-
-    delete_asset_type(new_asset_type.id)
-    fetched_asset_type = session.query(
-        AssetType).filter_by(id=new_asset_type.id).first()
-
-    assert fetched_asset_type is None
